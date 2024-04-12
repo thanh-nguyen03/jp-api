@@ -1,14 +1,28 @@
 import { Message } from './message';
+import { PageResultDto } from './page-result.dto';
 
 export default class ResponseDto<T = null> {
-  data: T;
+  data: T | T[];
   message: Message;
   success: boolean;
+  pageInfo?: PageResultDto<T>;
 
   constructor(data: T, message: Message, success: boolean) {
     this.data = data;
     this.message = message;
     this.success = success;
+
+    if (data instanceof PageResultDto) {
+      this.data = data.data;
+      this.pageInfo = {
+        total: data.total,
+        offset: data.offset,
+        limit: data.limit,
+
+        // Exclude data from the response
+        data: null,
+      };
+    }
   }
 
   static success<T>(data: T, message: Message) {

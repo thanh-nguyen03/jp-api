@@ -5,6 +5,7 @@ import configuration from './config/environments/configuration';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { AppLoggerMiddleware } from './middlewares/api-loggers.middleware';
+import { CompanyModule } from './modules/company/company.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AppLoggerMiddleware } from './middlewares/api-loggers.middleware';
     }),
     AuthModule,
     UserModule,
+    CompanyModule,
   ],
   controllers: [AppController],
   providers: [],
