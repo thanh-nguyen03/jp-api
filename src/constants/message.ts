@@ -10,8 +10,18 @@ export class Message {
     `User with Email: '${message}' already exists`;
 
   // Auth
-  static readonly LOGIN_SUCCESSFUL = 'Login successful';
-  static readonly REGISTER_SUCCESSFUL = 'Register successful';
+  static readonly LOGIN_SUCCESSFULLY = 'Login successfully';
+  static readonly REGISTER_SUCCESSFULLY = 'Register successfully';
   static readonly WRONG_EMAIL_OR_PASSWORD = 'Wrong email or password';
   static readonly INVALID_REFRESH_TOKEN = 'Invalid refresh token';
+
+  // Company
+  static readonly COMPANY_CREATED = 'Company created successfully';
+  static readonly COMPANY_UPDATED = 'Company updated successfully';
+  static readonly COMPANY_DELETED = 'Company deleted successfully';
+  static readonly COMPANY_NOT_FOUND = 'Company not found';
+  static readonly COMPANY_CODE_NOT_FOUND = (message: string) =>
+    `Company with code: '${message}' not found`;
+  static readonly COMPANY_CODE_ALREADY_EXISTS = (message: string) =>
+    `Company with code: '${message}' already exists`;
 }

@@ -15,7 +15,7 @@ datasource db {
 
 enum Role {
   USER
-  RECRUITER
+  COMPANY_HR
   COMPANY_ADMIN
   ADMIN
 }
@@ -45,4 +45,15 @@ model Token {
   updatedAt     DateTime @updatedAt
 
   @@unique([userId, access_token])
+}
+
+model Company {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  name        String
+  description String
+  address     String
+  logo        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

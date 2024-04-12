@@ -17,7 +17,7 @@ export class AuthController {
   async login(@Request() req: any) {
     return ResponseDto.success(
       await this.authService.login(req.user),
-      Message.LOGIN_SUCCESSFUL,
+      Message.LOGIN_SUCCESSFULLY,
     );
   }
 
@@ -31,6 +31,6 @@ export class AuthController {
   @Post('/register')
   async register(@Body() registerRequestDto: RegisterRequestDto) {
     await this.authService.register(registerRequestDto);
-    return ResponseDto.successWithoutData(Message.REGISTER_SUCCESSFUL);
+    return ResponseDto.successWithoutData(Message.REGISTER_SUCCESSFULLY);
   }
 }
