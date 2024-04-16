@@ -6,6 +6,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { AppLoggerMiddleware } from './middlewares/api-loggers.middleware';
 import { CompanyModule } from './modules/company/company.module';
+import { RecruitmentModule } from './modules/recruitments/recruitment.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CompanyModule } from './modules/company/company.module';
     AuthModule,
     UserModule,
     CompanyModule,
+    RecruitmentModule,
   ],
   controllers: [AppController],
   providers: [],

@@ -16,6 +16,7 @@ import { Message } from '../../../constants/message';
 import { CompanyDto } from '../dtos/company.dto';
 import { Roles } from '../../../decorators/role.decorator';
 import { Role } from '@prisma/client';
+import { CreateCompanyDto } from '../dtos/create-company.dto';
 
 @Roles(Role.ADMIN)
 @Controller('admin/companies')
@@ -42,7 +43,7 @@ export class AdminCompanyController {
   }
 
   @Post()
-  async createCompany(@Body() data: CompanyDto) {
+  async createCompany(@Body() data: CreateCompanyDto) {
     return ResponseDto.success(
       await this.companyService.createCompany(data),
       Message.COMPANY_CREATED,

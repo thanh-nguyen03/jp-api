@@ -14,4 +14,5 @@ export class UserDto implements User {
   password: string;
   role: $Enums.Role;
   updatedAt: Date;
+  companyId: number | null;
 }
