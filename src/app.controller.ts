@@ -12,7 +12,7 @@ export class AppController {
     return ResponseDto.successWithoutData('Hello World!');
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.COMPANY_ADMIN)
   @Get('admin-sample')
   getAdminHello() {
     return ResponseDto.successWithoutData('Hello Admin!');

@@ -9,6 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const PORT = process.env.PORT || 8081;
 
+  app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.useGlobalInterceptors(new JsonNullInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
