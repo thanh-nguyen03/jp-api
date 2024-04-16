@@ -13,6 +13,9 @@ export abstract class UserService {
   abstract getUserById(userId: number): Promise<UserDto>;
   abstract getUserByEmail(email: string): Promise<UserDto>;
   abstract createUser(data: Prisma.UserCreateInput): Promise<UserDto>;
+  abstract createCompanyAdminAccount(
+    data: Prisma.UserCreateInput,
+  ): Promise<UserDto>;
 }
 
 @Injectable()
@@ -51,11 +54,7 @@ export class UserServiceImpl extends UserService {
   async createUser(data: Prisma.UserCreateInput): Promise<UserDto> {
     const { email } = data;
 
-    const existingUser = await this.prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
+    const existingUser = await this.checkUserExists(email);
 
     if (existingUser) {
       throw new BadRequestException(Message.USER_ALREADY_EXISTS(email));
@@ -68,5 +67,35 @@ export class UserServiceImpl extends UserService {
         role: 'USER',
       },
     });
+  }
+
+  async createCompanyAdminAccount(
+    data: Prisma.UserCreateInput,
+  ): Promise<UserDto> {
+    const { email } = data;
+
+    const existingUser = await this.checkUserExists(email);
+
+    if (existingUser) {
+      throw new BadRequestException(Message.USER_ALREADY_EXISTS(email));
+    }
+
+    return this.prisma.user.create({
+      data: {
+        ...data,
+        password: await bcrypt.hash(data.password, 12),
+        role: 'COMPANY_ADMIN',
+      },
+    });
+  }
+
+  private checkUserExists(email: string): Promise<UserDto> {
+    return this.prisma.user
+      .findUnique({
+        where: {
+          email,
+        },
+      })
+      .then((user) => user);
   }
 }

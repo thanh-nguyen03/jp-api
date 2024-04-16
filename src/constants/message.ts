@@ -24,4 +24,12 @@ export class Message {
     `Company with code: '${message}' not found`;
   static readonly COMPANY_CODE_ALREADY_EXISTS = (message: string) =>
     `Company with code: '${message}' already exists`;
+
+  // Recruitment
+  static readonly RECRUITMENT_CREATED = 'Recruitment created successfully';
+  static readonly RECRUITMENT_UPDATED = 'Recruitment updated successfully';
+  static readonly RECRUITMENT_DELETED = 'Recruitment deleted successfully';
+  static readonly RECRUITMENT_NOT_FOUND = 'Recruitment not found';
+  static readonly RECRUITMENT_COMPANY_FORBIDDEN =
+    'Recruitment not belong to your company';
 }

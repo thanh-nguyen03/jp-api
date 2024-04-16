@@ -12,7 +12,7 @@ export const SortField = () =>
       ({ value }) =>
         value?.split(',')?.map((sortString) => {
           const field = sortString?.split(':')?.[0];
-          const direction = sortString?.split(':')?.[1]?.toUpperCase() ?? 'ASC';
+          const direction = sortString?.split(':')?.[1] ?? 'asc';
           return plainToClass(Sort, { field, direction });
         }),
       { toClassOnly: true },

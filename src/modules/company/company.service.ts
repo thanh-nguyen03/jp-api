@@ -10,9 +10,11 @@ import { Message } from '../../constants/message';
 import sortConvert from '../../helpers/sort-convert.helper';
 import { Prisma } from '@prisma/client';
 import { PageResultDto } from '../../constants/page-result.dto';
+import { UserService } from '../user/user.service';
+import { CreateCompanyDto } from './dtos/create-company.dto';
 
 export abstract class CompanyService {
-  abstract createCompany(data: CompanyDto): Promise<CompanyDto>;
+  abstract createCompany(data: CreateCompanyDto): Promise<CompanyDto>;
   abstract findAll(filter: CompanyFilter): Promise<PageResultDto<CompanyDto>>;
   abstract findById(id: number): Promise<CompanyDto>;
   abstract findByCode(code: string): Promise<CompanyDto>;
@@ -22,12 +24,22 @@ export abstract class CompanyService {
 
 @Injectable()
 export class CompanyServiceImpl extends CompanyService {
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userService: UserService,
+  ) {
     super();
   }
 
-  async createCompany(data: CompanyDto): Promise<CompanyDto> {
-    const { code } = data;
+  async createCompany(data: CreateCompanyDto): Promise<CompanyDto> {
+    const {
+      code,
+      companyAccountEmail,
+      companyAccountFirstName,
+      companyAccountLastName,
+      companyAccountPassword,
+      ...companyData
+    } = data;
     const existingCompany = await this.prisma.company.findUnique({
       where: { code },
     });
@@ -36,7 +48,24 @@ export class CompanyServiceImpl extends CompanyService {
       throw new BadRequestException(Message.COMPANY_CODE_ALREADY_EXISTS(code));
     }
 
-    return this.prisma.company.create({ data });
+    const user = await this.userService.createCompanyAdminAccount({
+      email: companyAccountEmail,
+      firstName: companyAccountFirstName,
+      lastName: companyAccountLastName,
+      password: companyAccountPassword,
+    });
+
+    return this.prisma.company.create({
+      data: {
+        code,
+        ...companyData,
+        accounts: {
+          connect: {
+            id: user.id,
+          },
+        },
+      },
+    });
   }
 
   async findAll(filter: CompanyFilter): Promise<PageResultDto<CompanyDto>> {

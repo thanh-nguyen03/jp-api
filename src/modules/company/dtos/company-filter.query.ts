@@ -1,12 +1,11 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { BaseFilter } from '../../../constants/filter';
 import { AcceptedSortField } from '../../../decorators/accepted-sort-field.decorator';
-import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CompanyFilter extends PartialType(BaseFilter) {
   @IsOptional()
   @IsString()
-  @MinLength(3)
   @MaxLength(10)
   code: string;
 

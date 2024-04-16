@@ -20,6 +20,13 @@ enum Role {
   ADMIN
 }
 
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  INTERNSHIP
+  REMOTE
+}
+
 model User {
   id          Int      @id @default(autoincrement())
   email       String   @unique
@@ -32,6 +39,8 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   Token       Token[]
+  company     Company? @relation(fields: [companyId], references: [id])
+  companyId   Int?
 }
 
 model Token {
@@ -56,4 +65,22 @@ model Company {
   logo        String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  accounts     User[]
+  recruitments Recruitment[]
+}
+
+model Recruitment {
+  id         Int      @id @default(autoincrement())
+  title      String
+  content    String
+  jobType    JobType
+  minSalary  Int
+  maxSalary  Int
+  experience Int
+  deadline   DateTime
+  company    Company  @relation(fields: [companyId], references: [id])
+  companyId  Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
