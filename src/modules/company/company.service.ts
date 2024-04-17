@@ -128,5 +128,10 @@ export class CompanyServiceImpl extends CompanyService {
     }
 
     await this.prisma.company.delete({ where: { id } });
+    await this.prisma.user.deleteMany({
+      where: {
+        companyId: id,
+      },
+    });
   }
 }
