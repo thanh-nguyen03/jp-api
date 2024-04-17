@@ -94,6 +94,8 @@ export class AuthServiceImpl extends AuthService {
 
     return {
       access_token,
+      refresh_token,
+      user,
     };
   }
 
