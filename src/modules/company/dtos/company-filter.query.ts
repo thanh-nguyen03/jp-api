@@ -7,13 +7,13 @@ export class CompanyFilter extends PartialType(BaseFilter) {
   @IsOptional()
   @IsString()
   @MaxLength(10)
-  code: string;
+  code?: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  name: string;
+  name?: string;
 
   @AcceptedSortField('id', 'code', 'name')
-  sort: BaseFilter['sort'];
+  sort?: BaseFilter['sort'];
 }
