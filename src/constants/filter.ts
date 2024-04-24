@@ -10,17 +10,17 @@ export class BaseFilter {
   @IsInt()
   @Transform(({ value }) => parseInt(value))
   @Min(0)
-  offset: number = 0;
+  offset?: number = 0;
 
   @IsOptional()
   @IsInt()
   @Transform(({ value }) => parseInt(value))
   @Min(0)
   @Max(100)
-  limit: number = 20;
+  limit?: number = 20;
 
   @AcceptedSortField()
   @SortField()
   @Default([])
-  sort: Array<Sort> = [];
+  sort?: Array<Sort> = [];
 }

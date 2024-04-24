@@ -7,6 +7,7 @@ import { UserModule } from './modules/user/user.module';
 import { AppLoggerMiddleware } from './middlewares/api-loggers.middleware';
 import { CompanyModule } from './modules/company/company.module';
 import { RecruitmentModule } from './modules/recruitments/recruitment.module';
+import { SleepMiddleware } from './middlewares/sleep.middleware';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { RecruitmentModule } from './modules/recruitments/recruitment.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
+    consumer.apply(SleepMiddleware).forRoutes('*');
     consumer.apply(AppLoggerMiddleware).forRoutes('*');
   }
 }

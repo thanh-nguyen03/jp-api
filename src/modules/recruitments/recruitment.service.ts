@@ -137,24 +137,39 @@ export class RecruitmentServiceImpl extends RecruitmentService {
         title: {
           contains: title,
         },
-        jobType: {
-          equals: jobType,
-        },
         companyId,
-        minSalary: {
-          gte: minSalary,
-        },
-        maxSalary: {
-          lte: maxSalary,
-        },
-        experience: {
-          gte: experience,
-        },
       },
       skip: offset,
       take: limit,
       orderBy: sortConvert(sort),
+      include: {
+        company: true,
+      },
     };
+
+    if (jobType) {
+      query.where.jobType = {
+        equals: jobType,
+      };
+    }
+
+    if (minSalary) {
+      query.where.minSalary = {
+        gte: minSalary,
+      };
+    }
+
+    if (maxSalary) {
+      query.where.maxSalary = {
+        lte: maxSalary,
+      };
+    }
+
+    if (experience) {
+      query.where.experience = {
+        lte: experience,
+      };
+    }
 
     if (user.role === Role.USER) {
       query.where.deadline = {
@@ -174,6 +189,9 @@ export class RecruitmentServiceImpl extends RecruitmentService {
     const recruitment = await this.prisma.recruitment.findUnique({
       where: {
         id: recruitmentId,
+      },
+      include: {
+        company: true,
       },
     });
 

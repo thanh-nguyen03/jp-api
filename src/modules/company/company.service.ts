@@ -79,6 +79,9 @@ export class CompanyServiceImpl extends CompanyService {
       skip: offset,
       take: limit,
       orderBy: sortConvert(sort),
+      include: {
+        recruitments: true,
+      },
     };
 
     const result = await this.prisma.$transaction([
@@ -91,7 +94,10 @@ export class CompanyServiceImpl extends CompanyService {
   }
 
   async findById(id: number): Promise<CompanyDto> {
-    const company = await this.prisma.company.findUnique({ where: { id } });
+    const company = await this.prisma.company.findUnique({
+      where: { id },
+      include: { recruitments: true },
+    });
 
     if (!company) {
       throw new NotFoundException(Message.COMPANY_NOT_FOUND);
@@ -101,7 +107,10 @@ export class CompanyServiceImpl extends CompanyService {
   }
 
   async findByCode(code: string): Promise<CompanyDto> {
-    const company = await this.prisma.company.findUnique({ where: { code } });
+    const company = await this.prisma.company.findUnique({
+      where: { code },
+      include: { recruitments: true },
+    });
 
     if (!company) {
       throw new NotFoundException(Message.COMPANY_CODE_NOT_FOUND(code));

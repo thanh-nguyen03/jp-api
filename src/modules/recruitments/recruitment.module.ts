@@ -7,10 +7,15 @@ import {
 import { CompanyModule } from '../company/company.module';
 import { PrismaModule } from '../../config/prisma/prisma.module';
 import { AdminRecruitmentController } from './controllers/admin-recruitment.controller';
+import { RecruitmentController } from './controllers/recruitment.controller';
 
 @Module({
   imports: [PrismaModule, CompanyModule],
-  controllers: [AdminRecruitmentController, ManageRecruitmentCompanyController],
+  controllers: [
+    AdminRecruitmentController,
+    ManageRecruitmentCompanyController,
+    RecruitmentController,
+  ],
   providers: [
     {
       provide: RecruitmentService,
