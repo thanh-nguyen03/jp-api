@@ -41,6 +41,7 @@ model User {
   Token       Token[]
   company     Company? @relation(fields: [companyId], references: [id])
   companyId   Int?
+  files       File[]
 }
 
 model Token {
@@ -83,4 +84,16 @@ model Recruitment {
   companyId  Int
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model File {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  size        Int
+  contentType String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

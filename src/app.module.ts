@@ -8,6 +8,7 @@ import { AppLoggerMiddleware } from './middlewares/api-loggers.middleware';
 import { CompanyModule } from './modules/company/company.module';
 import { RecruitmentModule } from './modules/recruitments/recruitment.module';
 import { SleepMiddleware } from './middlewares/sleep.middleware';
+import { FilesModule } from './modules/files/file.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SleepMiddleware } from './middlewares/sleep.middleware';
       isGlobal: true,
       load: [configuration],
     }),
+    FilesModule,
     AuthModule,
     UserModule,
     CompanyModule,

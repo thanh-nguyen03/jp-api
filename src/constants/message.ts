@@ -32,4 +32,8 @@ export class Message {
   static readonly RECRUITMENT_NOT_FOUND = 'Recruitment not found';
   static readonly RECRUITMENT_COMPANY_FORBIDDEN =
     'Recruitment not belong to your company';
+
+  // File
+  static readonly FILE_TOO_LARGE = 'File too large';
+  static readonly FILE_NOT_FOUND = 'File not found';
 }
