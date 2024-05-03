@@ -27,21 +27,28 @@ enum JobType {
   REMOTE
 }
 
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
-  firstName   String
-  lastName    String
-  password    String
-  displayName String?
-  avatar      String?
-  role        Role     @default(USER)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  Token       Token[]
-  company     Company? @relation(fields: [companyId], references: [id])
-  companyId   Int?
-  files       File[]
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  firstName    String
+  lastName     String
+  password     String
+  displayName  String?
+  avatar       String?
+  role         Role          @default(USER)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  Token        Token[]
+  company      Company?      @relation(fields: [companyId], references: [id])
+  companyId    Int?
+  files        File[]
+  applications Application[]
 }
 
 model Token {
@@ -72,28 +79,44 @@ model Company {
 }
 
 model Recruitment {
-  id         Int      @id @default(autoincrement())
-  title      String
-  content    String
-  jobType    JobType
-  minSalary  Int
-  maxSalary  Int
-  experience Int
-  deadline   DateTime
-  company    Company  @relation(fields: [companyId], references: [id])
-  companyId  Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id           Int           @id @default(autoincrement())
+  title        String
+  content      String
+  jobType      JobType
+  minSalary    Int
+  maxSalary    Int
+  experience   Int
+  deadline     DateTime
+  company      Company       @relation(fields: [companyId], references: [id])
+  companyId    Int
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  applications Application[]
 }
 
 model File {
-  id          String   @id @default(cuid())
-  key         String   @unique
+  id          String        @id @default(cuid())
+  key         String        @unique
   name        String
   size        Int
   contentType String
-  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdBy   User          @relation(fields: [createdById], references: [id])
   createdById Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  application Application[]
+}
+
+model Application {
+  id            Int               @id @default(autoincrement())
+  status        ApplicationStatus @default(PENDING)
+  message       String
+  user          User              @relation(fields: [userId], references: [id])
+  userId        Int
+  cv            File?             @relation(fields: [cvId], references: [id])
+  cvId          String?
+  recruitment   Recruitment       @relation(fields: [recruitmentId], references: [id])
+  recruitmentId Int
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 }

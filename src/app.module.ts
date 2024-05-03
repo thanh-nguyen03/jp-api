@@ -9,6 +9,7 @@ import { CompanyModule } from './modules/company/company.module';
 import { RecruitmentModule } from './modules/recruitments/recruitment.module';
 import { SleepMiddleware } from './middlewares/sleep.middleware';
 import { FilesModule } from './modules/files/file.module';
+import { ApplicationModule } from './modules/applications/application.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { FilesModule } from './modules/files/file.module';
     UserModule,
     CompanyModule,
     RecruitmentModule,
+    ApplicationModule,
   ],
   controllers: [AppController],
   providers: [],

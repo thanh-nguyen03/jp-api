@@ -8,9 +8,10 @@ import { CompanyModule } from '../company/company.module';
 import { PrismaModule } from '../../config/prisma/prisma.module';
 import { AdminRecruitmentController } from './controllers/admin-recruitment.controller';
 import { RecruitmentController } from './controllers/recruitment.controller';
+import { ApplicationModule } from '../applications/application.module';
 
 @Module({
-  imports: [PrismaModule, CompanyModule],
+  imports: [PrismaModule, CompanyModule, ApplicationModule],
   controllers: [
     AdminRecruitmentController,
     ManageRecruitmentCompanyController,
