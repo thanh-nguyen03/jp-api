@@ -2,6 +2,7 @@ export class Message {
   // Common
   static readonly SUCCESS = 'Success';
   static readonly ERROR = 'Error';
+  static readonly FORBIDDEN = 'Forbidden';
 
   // User
   static readonly USER_NOT_FOUND = (message: string) =>
@@ -32,6 +33,21 @@ export class Message {
   static readonly RECRUITMENT_NOT_FOUND = 'Recruitment not found';
   static readonly RECRUITMENT_COMPANY_FORBIDDEN =
     'Recruitment not belong to your company';
+
+  // Application
+  static readonly APPLICATION_NOT_FOUND = (message: string) =>
+    `Application with ID: '${message}' not found`;
+  static readonly CREATE_APPLICATION_SUCCESSFULLY = 'Apply successfully';
+  static readonly UPDATE_APPLICATION_SUCCESSFULLY =
+    'Update application successfully';
+  static readonly USER_ALREADY_APPLIED = (name: string) =>
+    `User '${name}' already applied`;
+  static readonly USER_NOT_APPLIED = (name: string) =>
+    `User '${name}' not applied`;
+
+  // CV
+  static readonly CV_NOT_FOUND = (message: string) =>
+    `CV with ID: '${message}' not found`;
 
   // File
   static readonly FILE_TOO_LARGE = 'File too large';

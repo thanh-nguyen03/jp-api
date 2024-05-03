@@ -12,5 +12,6 @@ import { PrismaModule } from '../../config/prisma/prisma.module';
       useClass: FileServiceImpl,
     },
   ],
+  exports: [FileService],
 })
 export class FilesModule {}
