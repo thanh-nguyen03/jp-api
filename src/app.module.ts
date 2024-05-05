@@ -10,6 +10,7 @@ import { RecruitmentModule } from './modules/recruitments/recruitment.module';
 import { SleepMiddleware } from './middlewares/sleep.middleware';
 import { FilesModule } from './modules/files/file.module';
 import { ApplicationModule } from './modules/applications/application.module';
+import { MailModule } from './config/mail/mail.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ApplicationModule } from './modules/applications/application.module';
       isGlobal: true,
       load: [configuration],
     }),
+    MailModule,
     FilesModule,
     AuthModule,
     UserModule,

@@ -8,12 +8,16 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Message } from '../../constants/message';
-import { Prisma, User } from '@prisma/client';
+import { $Enums, Prisma, User } from '@prisma/client';
 import sortConvert from '../../helpers/sort-convert.helper';
 import { UpdateApplicationDto } from './dtos/update-application.dto';
 import { FileService } from '../files/file.service';
+import { MailService } from '../../config/mail/mail.service';
+import mailApproveTemplate from '../../templates/mail-approve-template';
+import mailRejectedTemplate from '../../templates/mail-rejected-template';
 
 export abstract class ApplicationService {
   abstract createApplication(
@@ -34,6 +38,22 @@ export abstract class ApplicationService {
     recruitmentId: number,
     user: User,
   ): Promise<ApplicationDto>;
+
+  abstract findByRecruitment(
+    recruitmentId: number,
+    _user: User,
+  ): Promise<ApplicationDto[]>;
+
+  abstract getApplicationDetail(
+    applicationId: number,
+    _user: User,
+  ): Promise<ApplicationDto>;
+
+  abstract updateApplicationStatus(
+    applicationId: number,
+    _user: User,
+    isApproved: boolean,
+  ): Promise<ApplicationDto>;
 }
 
 @Injectable()
@@ -41,6 +61,7 @@ export class ApplicationServiceImpl extends ApplicationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly fileService: FileService,
+    private readonly mailService: MailService,
   ) {
     super();
   }
@@ -177,6 +198,118 @@ export class ApplicationServiceImpl extends ApplicationService {
     return PageResultDto.of(result[0], result[1], offset, limit);
   }
 
+  async findByRecruitment(recruitmentId: number, _user: User) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: _user.id,
+      },
+      include: {
+        company: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    if (!user.company) {
+      throw new ForbiddenException();
+    }
+
+    const recruitment = await this.prisma.recruitment.findUnique({
+      where: {
+        id: recruitmentId,
+      },
+      include: {
+        company: true,
+      },
+    });
+
+    if (!recruitment) {
+      throw new NotFoundException(Message.RECRUITMENT_NOT_FOUND);
+    }
+
+    if (recruitment.companyId !== user.company.id) {
+      throw new ForbiddenException(Message.RECRUITMENT_COMPANY_FORBIDDEN);
+    }
+
+    return this.prisma.application.findMany({
+      where: {
+        recruitmentId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        cv: true,
+      },
+    });
+  }
+
+  async getApplicationDetail(applicationId: number, _user: User) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: _user.id,
+      },
+      include: {
+        company: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    if (!user.company) {
+      throw new ForbiddenException();
+    }
+
+    const application = await this.prisma.application.findUnique({
+      where: {
+        id: applicationId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        cv: true,
+        recruitment: {
+          include: {
+            company: true,
+          },
+        },
+      },
+    });
+
+    if (!application) {
+      throw new NotFoundException(
+        Message.APPLICATION_NOT_FOUND(String(applicationId)),
+      );
+    }
+
+    if (application.recruitment.companyId !== user.company.id) {
+      throw new ForbiddenException(Message.APPLICATION_NOT_BELONG_TO_USER);
+    }
+
+    // create the signed url for the cv
+    const cvUrl = await this.fileService.get(application.cv.id);
+
+    return {
+      ...application,
+      cvUrl,
+    };
+  }
+
   async updateApplication(
     applicationId: number,
     data: UpdateApplicationDto,
@@ -207,6 +340,94 @@ export class ApplicationServiceImpl extends ApplicationService {
             id: cvId,
           },
         },
+      },
+    });
+  }
+
+  async updateApplicationStatus(
+    applicationId: number,
+    _user: User,
+    isApproved: boolean,
+  ): Promise<ApplicationDto> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: _user.id,
+      },
+      include: {
+        company: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    if (!user.company) {
+      throw new ForbiddenException(Message.APPLICATION_NOT_BELONG_TO_USER);
+    }
+
+    // check role
+    if (
+      user.role !== $Enums.Role.COMPANY_ADMIN ||
+      user.role !== $Enums.Role.COMPANY_ADMIN
+    ) {
+      throw new ForbiddenException();
+    }
+
+    const application = await this.prisma.application.findUnique({
+      where: {
+        id: applicationId,
+      },
+      include: {
+        user: true,
+        recruitment: {
+          include: {
+            company: true,
+          },
+        },
+      },
+    });
+
+    if (!application) {
+      throw new NotFoundException(
+        Message.APPLICATION_NOT_FOUND(String(applicationId)),
+      );
+    }
+
+    if (application.recruitment.companyId !== user.company.id) {
+      throw new ForbiddenException(Message.APPLICATION_NOT_BELONG_TO_USER);
+    }
+
+    // send email to user
+
+    if (isApproved) {
+      await this.mailService.sendMail(
+        application.user.email,
+        `Job Application for ${application.recruitment.title} - Approved`,
+        mailApproveTemplate(
+          `${application.user.firstName} ${application.user.lastName}`,
+          application.recruitment.title,
+          application.recruitment.company.name,
+        ),
+      );
+    } else {
+      await this.mailService.sendMail(
+        application.user.email,
+        `Job Application for ${application.recruitment.title} - Rejected`,
+        mailRejectedTemplate(
+          `${application.user.firstName} ${application.user.lastName}`,
+          application.recruitment.title,
+          application.recruitment.company.name,
+        ),
+      );
+    }
+
+    return this.prisma.application.update({
+      where: {
+        id: applicationId,
+      },
+      data: {
+        status: isApproved ? 'APPROVED' : 'REJECTED',
       },
     });
   }
