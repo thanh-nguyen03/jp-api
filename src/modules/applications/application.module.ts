@@ -6,10 +6,12 @@ import {
 } from './application.service';
 import { ApplicationController } from './controllers/application.controller';
 import { FilesModule } from '../files/file.module';
+import { MailModule } from '../../config/mail/mail.module';
+import { ManageApplicationController } from './controllers/manage-application.controller';
 
 @Module({
-  imports: [PrismaModule, FilesModule],
-  controllers: [ApplicationController],
+  imports: [PrismaModule, FilesModule, MailModule],
+  controllers: [ApplicationController, ManageApplicationController],
   providers: [
     {
       provide: ApplicationService,

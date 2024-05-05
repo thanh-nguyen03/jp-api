@@ -18,11 +18,15 @@ import { CurrentUser } from '../../../decorators/current-user.decorator';
 import { Message } from '../../../constants/message';
 import ResponseDto from '../../../constants/response.dto';
 import { RecruitmentDto } from '../dtos/recruitment.dto';
+import { ApplicationService } from '../../applications/application.service';
 
 @Controller('admin/recruitments')
 @Roles(Role.COMPANY_ADMIN)
 export class ManageRecruitmentCompanyController {
-  constructor(private readonly recruitmentService: RecruitmentService) {}
+  constructor(
+    private readonly recruitmentService: RecruitmentService,
+    private readonly applicationService: ApplicationService,
+  ) {}
 
   @Get()
   async getRecruitmentsOfCompany(
@@ -86,6 +90,16 @@ export class ManageRecruitmentCompanyController {
   ) {
     return ResponseDto.successDefault(
       await this.recruitmentService.deleteRecruitment(recruitmentId, user),
+    );
+  }
+
+  @Get(':recruitmentId/applications')
+  async findApplicationsOfRecruitment(
+    @Param('recruitmentId', ParseIntPipe) recruitmentId: number,
+    @CurrentUser() user: User,
+  ) {
+    return ResponseDto.successDefault(
+      await this.applicationService.findByRecruitment(recruitmentId, user),
     );
   }
 }

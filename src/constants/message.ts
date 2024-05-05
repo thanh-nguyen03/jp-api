@@ -44,6 +44,8 @@ export class Message {
     `User '${name}' already applied`;
   static readonly USER_NOT_APPLIED = (name: string) =>
     `User '${name}' not applied`;
+  static readonly APPLICATION_NOT_BELONG_TO_USER =
+    "Application does not belong to user's company";
 
   // CV
   static readonly CV_NOT_FOUND = (message: string) =>

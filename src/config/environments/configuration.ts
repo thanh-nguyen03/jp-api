@@ -9,6 +9,10 @@ export interface IConfig {
     region: string;
     bucketName: string;
   };
+  mail: {
+    user: string;
+    password: string;
+  };
 }
 
 export default (): IConfig => ({
@@ -21,5 +25,9 @@ export default (): IConfig => ({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     region: process.env.AWS_REGION,
     bucketName: process.env.BUCKET_NAME,
+  },
+  mail: {
+    user: process.env.MAIL_USER,
+    password: process.env.MAIL_PASSWORD,
   },
 });
