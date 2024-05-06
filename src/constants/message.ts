@@ -46,6 +46,8 @@ export class Message {
     `User '${name}' not applied`;
   static readonly APPLICATION_NOT_BELONG_TO_USER =
     "Application does not belong to user's company";
+  static readonly USER_NOT_ALLOWED_TO_APPLY =
+    'User is not allowed to apply for this recruitment';
 
   // CV
   static readonly CV_NOT_FOUND = (message: string) =>

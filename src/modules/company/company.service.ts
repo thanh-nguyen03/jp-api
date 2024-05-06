@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CompanyDto } from './dtos/company.dto';
 import { CompanyFilter } from './dtos/company-filter.query';
-import { PrismaService } from '../../config/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Message } from '../../constants/message';
 import sortConvert from '../../helpers/sort-convert.helper';
 import { Prisma } from '@prisma/client';

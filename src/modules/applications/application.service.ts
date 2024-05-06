@@ -1,7 +1,7 @@
 import { ApplicationDto } from './dtos/application.dto';
 import { CreateApplicationDto } from './dtos/create-application.dto';
 import { PageResultDto } from '../../constants/page-result.dto';
-import { PrismaService } from '../../config/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { ApplicationFilter } from './dtos/application-filter.query';
 import {
   BadRequestException,
@@ -15,7 +15,7 @@ import { $Enums, Prisma, User } from '@prisma/client';
 import sortConvert from '../../helpers/sort-convert.helper';
 import { UpdateApplicationDto } from './dtos/update-application.dto';
 import { FileService } from '../files/file.service';
-import { MailService } from '../../config/mail/mail.service';
+import { MailService } from '../mail/mail.service';
 import mailApproveTemplate from '../../templates/mail-approve-template';
 import mailRejectedTemplate from '../../templates/mail-rejected-template';
 
@@ -114,6 +114,10 @@ export class ApplicationServiceImpl extends ApplicationService {
 
     if (!user) {
       throw new BadRequestException(Message.USER_NOT_FOUND);
+    }
+
+    if (user.role !== $Enums.Role.USER) {
+      throw new ForbiddenException(Message.USER_NOT_ALLOWED_TO_APPLY);
     }
 
     const { cvId, recruitmentId, ...rest } = data;
