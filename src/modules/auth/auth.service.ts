@@ -6,7 +6,7 @@ import { RefreshAccessTokenRequestDto } from './dtos/refresh-access-token-reques
 import { RefreshAccessTokenResponseDto } from './dtos/refresh-access-token-response.dto';
 import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
-import { PrismaService } from '../../config/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { Message } from '../../constants/message';

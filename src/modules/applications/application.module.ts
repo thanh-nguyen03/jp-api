@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../../config/prisma/prisma.module';
+import { PrismaModule } from '../prisma/prisma.module';
 import {
   ApplicationService,
   ApplicationServiceImpl,
 } from './application.service';
 import { ApplicationController } from './controllers/application.controller';
 import { FilesModule } from '../files/file.module';
-import { MailModule } from '../../config/mail/mail.module';
+import { MailModule } from '../mail/mail.module';
 import { ManageApplicationController } from './controllers/manage-application.controller';
 
 @Module({

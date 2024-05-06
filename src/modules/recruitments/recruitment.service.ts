@@ -6,7 +6,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '../../config/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Message } from '../../constants/message';
 import { Prisma, Role, User } from '@prisma/client';
 import sortConvert from '../../helpers/sort-convert.helper';

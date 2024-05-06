@@ -10,7 +10,8 @@ import { RecruitmentModule } from './modules/recruitments/recruitment.module';
 import { SleepMiddleware } from './middlewares/sleep.middleware';
 import { FilesModule } from './modules/files/file.module';
 import { ApplicationModule } from './modules/applications/application.module';
-import { MailModule } from './config/mail/mail.module';
+import { MailModule } from './modules/mail/mail.module';
+import { StatisticModule } from './modules/statistics/statistic.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { MailModule } from './config/mail/mail.module';
     CompanyModule,
     RecruitmentModule,
     ApplicationModule,
+    StatisticModule,
   ],
   controllers: [AppController],
   providers: [],

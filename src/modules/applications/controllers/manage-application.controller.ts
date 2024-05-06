@@ -6,14 +6,15 @@ import {
   Param,
   ParseIntPipe,
   Put,
-  Query,
 } from '@nestjs/common';
 import { ApplicationService } from '../application.service';
 import ResponseDto from '../../../constants/response.dto';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { CurrentUser } from '../../../decorators/current-user.decorator';
+import { Roles } from '../../../decorators/role.decorator';
 
 @Controller('admin/applications')
+@Roles(Role.ADMIN, Role.COMPANY_ADMIN)
 export class ManageApplicationController {
   constructor(private readonly applicationService: ApplicationService) {}
 
