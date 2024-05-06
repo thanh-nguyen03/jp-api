@@ -14,7 +14,7 @@ import { CurrentUser } from '../../../decorators/current-user.decorator';
 import { Roles } from '../../../decorators/role.decorator';
 
 @Controller('admin/applications')
-@Roles(Role.ADMIN, Role.COMPANY_ADMIN)
+@Roles(Role.ADMIN, Role.COMPANY_ADMIN, Role.COMPANY_HR)
 export class ManageApplicationController {
   constructor(private readonly applicationService: ApplicationService) {}
 

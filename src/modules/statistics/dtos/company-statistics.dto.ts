@@ -6,4 +6,5 @@ export class CompanyStatisticsDto {
     rejected: number;
     pending: number;
   };
+  totalHRs: number;
 }

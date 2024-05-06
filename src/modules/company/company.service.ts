@@ -1,17 +1,21 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CompanyDto } from './dtos/company.dto';
 import { CompanyFilter } from './dtos/company-filter.query';
 import { PrismaService } from '../prisma/prisma.service';
 import { Message } from '../../constants/message';
 import sortConvert from '../../helpers/sort-convert.helper';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { PageResultDto } from '../../constants/page-result.dto';
 import { UserService } from '../user/user.service';
 import { CreateCompanyDto } from './dtos/create-company.dto';
+import { UserDto } from '../user/dtos/user.dto';
+import * as bcrypt from 'bcrypt';
 
 export abstract class CompanyService {
   abstract createCompany(data: CreateCompanyDto): Promise<CompanyDto>;
@@ -20,6 +24,12 @@ export abstract class CompanyService {
   abstract findByCode(code: string): Promise<CompanyDto>;
   abstract updateCompany(id: number, data: CompanyDto): Promise<CompanyDto>;
   abstract deleteCompany(id: number): Promise<void>;
+  abstract createCompanyHR(
+    data: Prisma.UserCreateInput[],
+    _user: User,
+  ): Promise<UserDto[]>;
+  abstract getCompanyHRList(_user: User): Promise<UserDto[]>;
+  abstract deleteCompanyHR(id: number, _user: User): Promise<void>;
 }
 
 @Injectable()
@@ -140,6 +150,89 @@ export class CompanyServiceImpl extends CompanyService {
     await this.prisma.user.deleteMany({
       where: {
         companyId: id,
+      },
+    });
+  }
+
+  async createCompanyHR(
+    data: Prisma.UserCreateInput[],
+    _user: User,
+  ): Promise<UserDto[]> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: _user.id,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    if (user.role !== 'COMPANY_ADMIN') {
+      throw new ForbiddenException();
+    }
+
+    return this.prisma.$transaction(
+      data.map((item) =>
+        this.prisma.user.create({
+          data: {
+            ...item,
+            password: bcrypt.hashSync(item.password, 12),
+            role: 'COMPANY_HR',
+            company: {
+              connect: {
+                id: user.companyId,
+              },
+            },
+          },
+        }),
+      ),
+    );
+  }
+
+  async getCompanyHRList(_user: User): Promise<UserDto[]> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: _user.id,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    if (user.role !== 'COMPANY_ADMIN') {
+      throw new ForbiddenException();
+    }
+
+    return this.prisma.user.findMany({
+      where: {
+        companyId: user.companyId,
+        role: 'COMPANY_HR',
+      },
+    });
+  }
+
+  async deleteCompanyHR(id: number, _user: User): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: _user.id,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    if (user.role !== 'COMPANY_ADMIN') {
+      throw new ForbiddenException();
+    }
+
+    await this.prisma.user.delete({
+      where: {
+        id,
+        companyId: user.companyId,
+        role: 'COMPANY_HR',
       },
     });
   }

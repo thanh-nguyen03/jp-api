@@ -29,6 +29,7 @@ export class ManageRecruitmentCompanyController {
   ) {}
 
   @Get()
+  @Roles(Role.COMPANY_ADMIN, Role.COMPANY_HR)
   async getRecruitmentsOfCompany(
     @Query() filter: RecruitmentFilter,
     @CurrentUser() user: User,
@@ -45,6 +46,7 @@ export class ManageRecruitmentCompanyController {
   }
 
   @Get(':id')
+  @Roles(Role.COMPANY_ADMIN, Role.COMPANY_HR)
   async getRecruitmentDetail(
     @CurrentUser() user: User,
     @Param('id', ParseIntPipe) recruitmentId: number,
@@ -94,6 +96,7 @@ export class ManageRecruitmentCompanyController {
   }
 
   @Get(':recruitmentId/applications')
+  @Roles(Role.COMPANY_ADMIN, Role.COMPANY_HR)
   async findApplicationsOfRecruitment(
     @Param('recruitmentId', ParseIntPipe) recruitmentId: number,
     @CurrentUser() user: User,
