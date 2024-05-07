@@ -3,13 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserDto } from './dtos/user.dto';
 import { Message } from '../../constants/message';
 import { UserFilter } from './dtos/user-filter.dto';
 import sortConvert from '../../helpers/sort-convert.helper';
+import { ChangePasswordDto } from './dtos/change-password.dto';
 
 export abstract class UserService {
   abstract getUserById(userId: number): Promise<UserDto>;
@@ -19,6 +20,10 @@ export abstract class UserService {
     data: Prisma.UserCreateInput,
   ): Promise<UserDto>;
   abstract findAll(filter: UserFilter): Promise<UserDto[]>;
+  abstract changePassword(
+    changePasswordDto: ChangePasswordDto,
+    _user: User,
+  ): Promise<void>;
 }
 
 @Injectable()
@@ -120,6 +125,32 @@ export class UserServiceImpl extends UserService {
         },
       },
       orderBy: sortConvert(sort),
+    });
+  }
+
+  async changePassword(
+    changePasswordDto: ChangePasswordDto,
+    _user: User,
+  ): Promise<void> {
+    const { currentPassword, newPassword } = changePasswordDto;
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: _user.id,
+      },
+    });
+
+    if (!user || !bcrypt.compareSync(currentPassword, user.password)) {
+      throw new BadRequestException(Message.WRONG_CURRENT_PASSWORD);
+    }
+
+    await this.prisma.user.update({
+      where: {
+        id: _user.id,
+      },
+      data: {
+        password: await bcrypt.hash(newPassword, 12),
+      },
     });
   }
 
