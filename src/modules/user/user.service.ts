@@ -122,6 +122,7 @@ export class UserServiceImpl extends UserService {
       orderBy: sortConvert(sort),
     });
   }
+
   private checkUserExists(email: string): Promise<UserDto> {
     return this.prisma.user
       .findUnique({

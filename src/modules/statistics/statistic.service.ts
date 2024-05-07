@@ -111,9 +111,17 @@ export class StatisticServiceImpl extends StatisticService {
       }),
     };
 
+    const totalHRs = await this.prisma.user.count({
+      where: {
+        companyId: user.companyId,
+        role: 'COMPANY_HR',
+      },
+    });
+
     return {
       totalRecruitments,
       totalApplications,
+      totalHRs,
     };
   }
 
