@@ -15,6 +15,7 @@ export class Message {
   static readonly REGISTER_SUCCESSFULLY = 'Register successfully';
   static readonly WRONG_EMAIL_OR_PASSWORD = 'Wrong email or password';
   static readonly INVALID_REFRESH_TOKEN = 'Invalid refresh token';
+  static readonly WRONG_CURRENT_PASSWORD = 'Wrong current password';
 
   // Company
   static readonly COMPANY_CREATED = 'Company created successfully';
