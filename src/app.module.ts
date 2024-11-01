@@ -10,6 +10,7 @@ import { FilesModule } from './modules/files/file.module';
 import { ApplicationModule } from './modules/applications/application.module';
 import { MailModule } from './modules/mail/mail.module';
 import { StatisticModule } from './modules/statistics/statistic.module';
+import { SleepMiddleware } from './middlewares/sleep.middleware';
 
 @Module({
   imports: [
@@ -32,7 +33,7 @@ import { StatisticModule } from './modules/statistics/statistic.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
-    // consumer.apply(SleepMiddleware).forRoutes('*');
+    consumer.apply(SleepMiddleware).forRoutes('*');
     consumer.apply(AppLoggerMiddleware).forRoutes('*');
   }
 }

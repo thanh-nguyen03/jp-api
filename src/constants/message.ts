@@ -35,6 +35,8 @@ export class Message {
   static readonly RECRUITMENT_NOT_FOUND = 'Recruitment not found';
   static readonly RECRUITMENT_COMPANY_FORBIDDEN =
     'Recruitment not belong to your company';
+  static readonly RECRUITMENT_DEADLINE_PASSED =
+    'Recruitment deadline has passed';
 
   // Application
   static readonly APPLICATION_NOT_FOUND = (message: string) =>

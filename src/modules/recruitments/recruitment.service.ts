@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Message } from '../../constants/message';
-import { Prisma, Role, User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import sortConvert from '../../helpers/sort-convert.helper';
 import { CompanyService } from '../company/company.service';
 
@@ -67,7 +67,7 @@ export class RecruitmentServiceImpl extends RecruitmentService {
 
   async updateRecruitment(
     recruitmentId: number,
-    data: RecruitmentDto,
+    data: Prisma.RecruitmentUpdateInput,
     user: User,
   ): Promise<RecruitmentDto> {
     const { companyId } = user;
@@ -88,9 +88,12 @@ export class RecruitmentServiceImpl extends RecruitmentService {
       throw new ForbiddenException(Message.RECRUITMENT_COMPANY_FORBIDDEN);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { company, ...rest } = data;
+
     return this.prisma.recruitment.update({
       where: { id: recruitmentId },
-      data,
+      data: rest,
     });
   }
 
@@ -118,6 +121,7 @@ export class RecruitmentServiceImpl extends RecruitmentService {
 
   async findAll(
     filter: RecruitmentFilter,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     user: User,
   ): Promise<PageResultDto<RecruitmentDto>> {
     const {
@@ -168,12 +172,6 @@ export class RecruitmentServiceImpl extends RecruitmentService {
     if (experience) {
       query.where.experience = {
         lte: experience,
-      };
-    }
-
-    if (user.role === Role.USER) {
-      query.where.deadline = {
-        gte: new Date(),
       };
     }
 

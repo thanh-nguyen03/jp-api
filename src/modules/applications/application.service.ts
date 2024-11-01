@@ -135,6 +135,11 @@ export class ApplicationServiceImpl extends ApplicationService {
       throw new BadRequestException(Message.RECRUITMENT_NOT_FOUND);
     }
 
+    // check if not passed the deadline
+    if (recruitment.deadline < new Date()) {
+      throw new BadRequestException(Message.RECRUITMENT_DEADLINE_PASSED);
+    }
+
     const cv = await this.prisma.file.findUnique({
       where: {
         id: cvId,
@@ -372,8 +377,8 @@ export class ApplicationServiceImpl extends ApplicationService {
 
     // check role
     if (
-      user.role !== $Enums.Role.COMPANY_ADMIN ||
-      user.role !== $Enums.Role.COMPANY_ADMIN
+      user.role !== $Enums.Role.COMPANY_ADMIN &&
+      user.role !== $Enums.Role.COMPANY_HR
     ) {
       throw new ForbiddenException();
     }

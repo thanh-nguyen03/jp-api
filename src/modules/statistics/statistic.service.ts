@@ -19,7 +19,11 @@ export class StatisticServiceImpl extends StatisticService {
   }
 
   async getAdminCommonStatistics(): Promise<AdminStatisticsDto> {
-    const totalUsers = await this.prisma.user.count();
+    const totalUsers = await this.prisma.user.count({
+      where: {
+        role: 'USER',
+      },
+    });
     const totalCompanies = await this.prisma.company.count();
     const totalRecruitments = await this.prisma.recruitment.count();
     const totalApplications = {

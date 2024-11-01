@@ -11,6 +11,6 @@ export class UserFilter extends BaseFilter {
   @IsString()
   email?: string;
 
-  @AcceptedSortField('id', 'name')
+  @AcceptedSortField('id', 'name', 'createdAt')
   sort?: BaseFilter['sort'];
 }

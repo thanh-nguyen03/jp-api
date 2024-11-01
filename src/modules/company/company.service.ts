@@ -136,7 +136,17 @@ export class CompanyServiceImpl extends CompanyService {
       throw new NotFoundException(Message.COMPANY_NOT_FOUND);
     }
 
-    return this.prisma.company.update({ where: { id }, data });
+    const { code, name, description, address } = data;
+
+    return this.prisma.company.update({
+      where: { id },
+      data: {
+        code,
+        name,
+        description,
+        address,
+      },
+    });
   }
 
   async deleteCompany(id: number): Promise<void> {
