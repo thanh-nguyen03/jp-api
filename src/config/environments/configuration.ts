@@ -13,6 +13,13 @@ export interface IConfig {
     user: string;
     password: string;
   };
+  amqp: {
+    host: string;
+    port: number;
+    user: string;
+    password: string;
+    vhost: string;
+  };
 }
 
 export default (): IConfig => ({
@@ -29,5 +36,12 @@ export default (): IConfig => ({
   mail: {
     user: process.env.MAIL_USER,
     password: process.env.MAIL_PASSWORD,
+  },
+  amqp: {
+    host: process.env.AMQP_HOST,
+    port: parseInt(process.env.AMQP_PORT),
+    user: process.env.AMQP_USER,
+    password: process.env.AMQP_PASSWORD,
+    vhost: process.env.AMQP_VHOST,
   },
 });
