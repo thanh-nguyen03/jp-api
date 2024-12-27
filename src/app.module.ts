@@ -11,6 +11,8 @@ import { ApplicationModule } from './modules/applications/application.module';
 import { MailModule } from './modules/mail/mail.module';
 import { StatisticModule } from './modules/statistics/statistic.module';
 import { SleepMiddleware } from './middlewares/sleep.middleware';
+import { AmqpConfigModule } from './config/amqp/amqp-config.module';
+import { AmqpModule } from './modules/amqp/amqp.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { SleepMiddleware } from './middlewares/sleep.middleware';
       isGlobal: true,
       load: [configuration],
     }),
+    AmqpConfigModule,
+    AmqpModule,
     MailModule,
     FilesModule,
     AuthModule,

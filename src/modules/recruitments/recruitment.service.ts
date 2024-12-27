@@ -11,6 +11,11 @@ import { Message } from '../../constants/message';
 import { Prisma, User } from '@prisma/client';
 import sortConvert from '../../helpers/sort-convert.helper';
 import { CompanyService } from '../company/company.service';
+import { AmqpService } from '../amqp/amqp.service';
+import {
+  QUEUE_NAME,
+  SUGGEST_SERVICE_MESSAGE_TYPE,
+} from '../../constants/amqp_constants';
 
 export abstract class RecruitmentService {
   abstract createRecruitment(
@@ -35,6 +40,7 @@ export class RecruitmentServiceImpl extends RecruitmentService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly companyService: CompanyService,
+    private readonly amqpService: AmqpService,
   ) {
     super();
   }
@@ -53,7 +59,7 @@ export class RecruitmentServiceImpl extends RecruitmentService {
       throw new NotFoundException(Message.COMPANY_NOT_FOUND);
     }
 
-    return this.prisma.recruitment.create({
+    const recruitment = await this.prisma.recruitment.create({
       data: {
         ...recruitmentData,
         company: {
@@ -63,6 +69,14 @@ export class RecruitmentServiceImpl extends RecruitmentService {
         },
       },
     });
+
+    // Emit message to AMQP
+    this.amqpService.emitMessage(QUEUE_NAME.SUGGEST_SERVICE_QUEUE, '', {
+      type: SUGGEST_SERVICE_MESSAGE_TYPE.CREATE_RECRUITMENT,
+      data: recruitment,
+    });
+
+    return recruitment;
   }
 
   async updateRecruitment(
@@ -91,10 +105,18 @@ export class RecruitmentServiceImpl extends RecruitmentService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { company, ...rest } = data;
 
-    return this.prisma.recruitment.update({
+    const updatedRecruitment = await this.prisma.recruitment.update({
       where: { id: recruitmentId },
       data: rest,
     });
+
+    // Emit message to AMQP
+    this.amqpService.emitMessage(QUEUE_NAME.SUGGEST_SERVICE_QUEUE, '', {
+      type: SUGGEST_SERVICE_MESSAGE_TYPE.UPDATE_RECRUITMENT,
+      data: updatedRecruitment,
+    });
+
+    return updatedRecruitment;
   }
 
   async deleteRecruitment(recruitmentId: number, user: User): Promise<void> {
@@ -116,6 +138,12 @@ export class RecruitmentServiceImpl extends RecruitmentService {
       where: {
         id: recruitmentId,
       },
+    });
+
+    // Emit message to AMQP
+    this.amqpService.emitMessage(QUEUE_NAME.SUGGEST_SERVICE_QUEUE, '', {
+      type: SUGGEST_SERVICE_MESSAGE_TYPE.DELETE_RECRUITMENT,
+      data: recruitment.id,
     });
   }
 
