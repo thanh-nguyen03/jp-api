@@ -18,6 +18,7 @@ import { FileService } from '../files/file.service';
 import { MailService } from '../mail/mail.service';
 import mailApproveTemplate from '../../templates/mail-approve-template';
 import mailRejectedTemplate from '../../templates/mail-rejected-template';
+import { AmqpService } from '../amqp/amqp.service';
 
 export abstract class ApplicationService {
   abstract createApplication(
@@ -62,6 +63,7 @@ export class ApplicationServiceImpl extends ApplicationService {
     private readonly prisma: PrismaService,
     private readonly fileService: FileService,
     private readonly mailService: MailService,
+    private readonly amqpService: AmqpService,
   ) {
     super();
   }
@@ -407,31 +409,7 @@ export class ApplicationServiceImpl extends ApplicationService {
       throw new ForbiddenException(Message.APPLICATION_NOT_BELONG_TO_USER);
     }
 
-    // send email to user
-
-    if (isApproved) {
-      await this.mailService.sendMail(
-        application.user.email,
-        `Job Application for ${application.recruitment.title} - Approved`,
-        mailApproveTemplate(
-          `${application.user.firstName} ${application.user.lastName}`,
-          application.recruitment.title,
-          application.recruitment.company.name,
-        ),
-      );
-    } else {
-      await this.mailService.sendMail(
-        application.user.email,
-        `Job Application for ${application.recruitment.title} - Rejected`,
-        mailRejectedTemplate(
-          `${application.user.firstName} ${application.user.lastName}`,
-          application.recruitment.title,
-          application.recruitment.company.name,
-        ),
-      );
-    }
-
-    return this.prisma.application.update({
+    const updatedApplication = await this.prisma.application.update({
       where: {
         id: applicationId,
       },
@@ -439,5 +417,20 @@ export class ApplicationServiceImpl extends ApplicationService {
         status: isApproved ? 'APPROVED' : 'REJECTED',
       },
     });
+
+    // send email to user
+    if (isApproved) {
+      this.amqpService.emitMessage('notification-queue', '', {
+        type: 'APPROVED',
+        application,
+      });
+    } else {
+      this.amqpService.emitMessage('notification-queue', '', {
+        type: 'REJECTED',
+        application,
+      });
+    }
+
+    return updatedApplication;
   }
 }

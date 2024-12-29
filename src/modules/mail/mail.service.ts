@@ -16,7 +16,7 @@ export class MailService {
   }
 
   async sendMail(to: string, subject: string, content: string) {
-    const result = await this.transporter.sendMail({
+    await this.transporter.sendMail({
       from: this.configService.get('mail').user,
       to,
       subject,

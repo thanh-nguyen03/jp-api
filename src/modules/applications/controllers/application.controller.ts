@@ -14,10 +14,15 @@ import { User } from '@prisma/client';
 import ResponseDto from '../../../constants/response.dto';
 import { Message } from '../../../constants/message';
 import { ApplicationDto } from '../dtos/application.dto';
+import { AmqpService } from '../../amqp/amqp.service';
+import { Public } from '../../../decorators/public.decorator';
 
 @Controller('applications')
 export class ApplicationController {
-  constructor(private readonly applicationService: ApplicationService) {}
+  constructor(
+    private readonly applicationService: ApplicationService,
+    private readonly amqpService: AmqpService,
+  ) {}
 
   @Post()
   async apply(@Body() data: CreateApplicationDto, @CurrentUser() user: User) {
@@ -25,6 +30,17 @@ export class ApplicationController {
       await this.applicationService.createApplication(data, user.id),
       Message.CREATE_APPLICATION_SUCCESSFULLY,
     );
+  }
+
+  @Post('mock')
+  @Public()
+  async mock() {
+    this.amqpService.emitMessage('notification-queue', '', {
+      type: 'approved',
+      application: {
+        id: 'abc',
+      },
+    });
   }
 
   @Put(':applicationId')

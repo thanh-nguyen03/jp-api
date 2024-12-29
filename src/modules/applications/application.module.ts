@@ -8,9 +8,10 @@ import { ApplicationController } from './controllers/application.controller';
 import { FilesModule } from '../files/file.module';
 import { MailModule } from '../mail/mail.module';
 import { ManageApplicationController } from './controllers/manage-application.controller';
+import { AmqpModule } from '../amqp/amqp.module';
 
 @Module({
-  imports: [PrismaModule, FilesModule, MailModule],
+  imports: [PrismaModule, FilesModule, MailModule, AmqpModule],
   controllers: [ApplicationController, ManageApplicationController],
   providers: [
     {

@@ -22,7 +22,6 @@ export class FileController {
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() user: User,
   ) {
-    console.log('file', file);
     return ResponseDto.successDefault(
       await this.fileService.upload(file, user),
     );
