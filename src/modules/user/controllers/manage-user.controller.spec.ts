@@ -276,7 +276,14 @@ describe('ManageUserController', () => {
 
   describe('GET /api/manage/users', () => {
     describe('GET /api/admin/users', () => {
-      it('should return all users without filters', async () => {
+      /**
+       * Test Case: TC01_MUC_AllUsers_NoFilter
+       * Objective: Verify that all users are returned when no filters are applied
+       * Input: No query parameters
+       * Expected Output: Array of all users with correct fields and date formats
+       * Notes: Ensures basic endpoint functionality for admin access
+       */
+      it('TC01_MUC_AllUsers_NoFilter', async () => {
         userService.findAll.mockResolvedValue(mockUsers);
 
         const response = await request(app.getHttpServer())
@@ -296,8 +303,14 @@ describe('ManageUserController', () => {
           ResponseDto.successDefault(mockUsersWithStringDates),
         );
       });
-
-      it('should return users filtered by email', async () => {
+      /**
+       * Test Case: TC02_MUC_Users_FilterByEmail
+       * Objective: Verify that users can be filtered by email
+       * Input: Query param `email=jane@example.com`
+       * Expected Output: Array containing only users with matching email
+       * Notes: Filters by unique email value
+       */
+      it('TC02_MUC_Users_FilterByEmail', async () => {
         const filter = { email: 'jane@example.com' };
         const filteredUsers = mockUsers.filter(
           (user) => user.email === 'jane@example.com',
@@ -322,8 +335,14 @@ describe('ManageUserController', () => {
           ResponseDto.successDefault(filteredUsersWithStringDates),
         );
       });
-
-      it('should return users filtered by name', async () => {
+      /**
+       * Test Case: TC03_MUC_Users_FilterByName
+       * Objective: Verify that users can be filtered by name
+       * Input: Query param `name=John`
+       * Expected Output: Array of users whose first or last name includes "John"
+       * Notes: Tests name-based search functionality
+       */
+      it('TC03_MUC_Users_FilterByName', async () => {
         const filter = { name: 'John' };
         const filteredUsers = mockUsers.filter(
           (user) =>
@@ -350,8 +369,14 @@ describe('ManageUserController', () => {
           ResponseDto.successDefault(filteredUsersWithStringDates),
         );
       });
-
-      it('should return empty array when no users match filter', async () => {
+      /**
+       * Test Case: TC04_MUC_Users_EmptyResult
+       * Objective: Verify that endpoint returns an empty array when no user matches filter
+       * Input: Query param `name=NonExistent`
+       * Expected Output: Empty array with success response
+       * Notes: Validates empty results without error
+       */
+      it('TC04_MUC_Users_EmptyResult_should return empty array when no users match filter', async () => {
         const filter = { name: 'NonExistent' };
         userService.findAll.mockResolvedValue([]);
 
@@ -364,8 +389,14 @@ describe('ManageUserController', () => {
         expect(userService.findAll).toHaveBeenCalledWith(filter);
         expect(response.body).toEqual(ResponseDto.successDefault([]));
       });
-
-      it('should return 500 for service error', async () => {
+      /**
+       * Test Case: TC05_MUC_Users_ServiceError
+       * Objective: Verify that 500 error is returned when service throws an error
+       * Input: Query param `name=John` with service throwing exception
+       * Expected Output: HTTP 500 error
+       * Notes: Simulates service layer failure
+       */
+      it('TC05_MUC_Users_ServiceError_should return 500 for service error', async () => {
         const filter = { name: 'John' };
         const error = new Error('Service error');
         userService.findAll.mockRejectedValue(error);
@@ -378,14 +409,27 @@ describe('ManageUserController', () => {
 
         expect(userService.findAll).toHaveBeenCalledWith(filter);
       });
-
-      it('should return 401 when no user is provided', async () => {
+      /**
+       * Test Case: TC06_MUC_Users_Unauthorized
+       * Objective: Verify that request without current user is rejected
+       * Input: No `x-current-user` header
+       * Expected Output: HTTP 401 Unauthorized
+       * Notes: Validates auth guard behavior
+       */
+      it('TC06_MUC_Users_Unauthorized_should return 401 when no user is provided', async () => {
         await request(app.getHttpServer()).get('/api/admin/users').expect(401);
 
         expect(userService.findAll).not.toHaveBeenCalled();
       });
 
-      it('should return 403 for invalid role', async () => {
+      /**
+       * Test Case: TC07_MUC_Users_ForbiddenRole
+       * Objective: Verify that user with non-admin role is forbidden
+       * Input: Valid user with role USER
+       * Expected Output: HTTP 403 Forbidden
+       * Notes: Ensures role-based access control is enforced
+       */
+      it('TC07_MUC_Users_ForbiddenRole_should return 403 for invalid role', async () => {
         const invalidUser = { ...mockUser, role: Role.USER };
 
         await request(app.getHttpServer())
@@ -398,7 +442,14 @@ describe('ManageUserController', () => {
     });
 
     describe('GET /api/admin/users/:id', () => {
-      it('should return user details for valid ID', async () => {
+      /**
+       * Test Case: TC08_MUC_UserDetails_ValidId
+       * Objective: Verify that valid user ID returns detailed user info
+       * Input: ID = 1
+       * Expected Output: JSON with user data and string-formatted dates
+       * Notes: Valid ID, authorized request
+       */
+      it('TC08_MUC_UserDetails_ValidId_should return user details for valid ID', async () => {
         userService.getUserById.mockResolvedValue(mockUser);
 
         const response = await request(app.getHttpServer())
@@ -419,8 +470,14 @@ describe('ManageUserController', () => {
           ResponseDto.successDefault(mockUserWithStringDates),
         );
       });
-
-      it('should return 404 for non-existent user', async () => {
+      /**
+       * Test Case: TC09_MUC_UserDetails_NotFound
+       * Objective: Verify that non-existent user ID returns 404
+       * Input: ID = 999
+       * Expected Output: HTTP 404 Not Found
+       * Notes: User does not exist in DB
+       */
+      it('TC09_MUC_UserDetails_NotFound_should return 404 for non-existent user', async () => {
         userService.getUserById.mockRejectedValue(
           new NotFoundException('User not found'),
         );
@@ -432,8 +489,14 @@ describe('ManageUserController', () => {
 
         expect(userService.getUserById).toHaveBeenCalledWith(999);
       });
-
-      it('should return 500 for service error', async () => {
+      /**
+       * Test Case: TC10_MUC_UserDetails_ServiceError
+       * Objective: Verify that 500 error is returned when service throws an error
+       * Input: ID = 1, service throws exception
+       * Expected Output: HTTP 500 Internal Server Error
+       * Notes: Simulates backend failure scenario
+       */
+      it('TC10_MUC_UserDetails_ServiceError_should return 500 for service error', async () => {
         const error = new Error('Service error');
         userService.getUserById.mockRejectedValue(error);
 
@@ -444,8 +507,15 @@ describe('ManageUserController', () => {
 
         expect(userService.getUserById).toHaveBeenCalledWith(1);
       });
+      /**
+       * Test Case: TC11_MUC_UserDetails_InvalidId
+       * Objective: Verify that invalid ID format returns 400
+       * Input: ID = 'invalid-id'
+       * Expected Output: HTTP 400 Bad Request
+       * Notes: Ensures input validation catches wrong format
+       */
 
-      it('should return 400 for invalid ID format', async () => {
+      it('TC11_MUC_UserDetails_InvalidId_should return 400 for invalid ID format', async () => {
         await request(app.getHttpServer())
           .get('/api/admin/users/invalid-id')
           .set('x-current-user', JSON.stringify(mockUser))
@@ -453,16 +523,28 @@ describe('ManageUserController', () => {
 
         expect(userService.getUserById).not.toHaveBeenCalled();
       });
-
-      it('should return 401 when no user is provided', async () => {
+      /**
+       * Test Case: TC12_MUC_UserDetails_Unauthorized
+       * Objective: Verify that request without current user is rejected
+       * Input: No `x-current-user` header
+       * Expected Output: HTTP 401 Unauthorized
+       * Notes: Validates authentication enforcement
+       */
+      it('TC12_MUC_UserDetails_Unauthorized_should return 401 when no user is provided', async () => {
         await request(app.getHttpServer())
           .get('/api/admin/users/1')
           .expect(401);
 
         expect(userService.getUserById).not.toHaveBeenCalled();
       });
-
-      it('should return 403 for invalid role', async () => {
+      /**
+       * Test Case: TC13_MUC_UserDetails_ForbiddenRole
+       * Objective: Verify that user with USER role cannot access user details
+       * Input: Valid ID, role: USER
+       * Expected Output: HTTP 403 Forbidden
+       * Notes: Ensures role-based permission checks
+       */
+      it('TC13_MUC_UserDetails_ForbiddenRole_should return 403 for invalid role', async () => {
         const invalidUser = { ...mockUser, role: Role.USER };
 
         await request(app.getHttpServer())
