@@ -7,6 +7,8 @@ import { Role, User } from '@prisma/client';
 import ResponseDto from '../../../constants/response.dto';
 import { AdminStatisticsDto } from '../dtos/admin-statistics.dto';
 import { CompanyStatisticsDto } from '../dtos/company-statistics.dto';
+import { APP_GUARD } from '@nestjs/core';
+import { RoleGuard } from '../../auth/guards/role.guard';
 
 // Test suite for AdminStatisticController GET /admin/statistics endpoint
 describe('AdminStatisticController - GET /admin/statistics (Integration)', () => {
@@ -57,7 +59,12 @@ describe('AdminStatisticController - GET /admin/statistics (Integration)', () =>
           provide: StatisticService,
           useValue: statisticServiceMock,
         },
+        {
+          provide: APP_GUARD,
+          useClass: RoleGuard, // Apply RolesGuard globally
+        },
       ],
+      imports: [],
     }).compile();
 
     nestApp = module.createNestApplication();
@@ -78,6 +85,19 @@ describe('AdminStatisticController - GET /admin/statistics (Integration)', () =>
           : null;
         return user;
       });
+
+    // Middleware to parse x-current-user header and attach user to request
+    nestApp.use((req, res, next) => {
+      if (req.headers['x-current-user']) {
+        const rawUser = JSON.parse(req.headers['x-current-user']);
+        req.user = {
+          ...rawUser,
+          createdAt: new Date(rawUser.createdAt),
+          updatedAt: new Date(rawUser.updatedAt),
+        };
+      }
+      next();
+    });
 
     await nestApp.init();
   });
@@ -108,7 +128,6 @@ describe('AdminStatisticController - GET /admin/statistics (Integration)', () =>
     expect(mockedStatisticService.getAdminCommonStatistics).toHaveBeenCalled();
     expect(response.body).toEqual(ResponseDto.successDefault(adminStatistics));
   });
-
   /**
    * Test Case: TC2_Stat_InvalidRole
    * Objective: Verify that non-ADMIN users receive Forbidden error
@@ -211,6 +230,10 @@ describe('AdminStatisticController - GET /admin/statistics/company (Integration)
         {
           provide: StatisticService,
           useValue: statisticServiceMock,
+        },
+        {
+          provide: APP_GUARD,
+          useClass: RoleGuard, // Apply RolesGuard globally
         },
       ],
     }).compile();

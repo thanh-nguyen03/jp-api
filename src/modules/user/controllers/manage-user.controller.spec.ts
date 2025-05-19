@@ -176,6 +176,8 @@ import { ManageUserController } from './manage-user.controller';
 import { UserService } from '../user.service';
 import { Role, User } from '@prisma/client';
 import ResponseDto from '../../../constants/response.dto';
+import { APP_GUARD } from '@nestjs/core';
+import { RoleGuard } from '../../auth/guards/role.guard';
 
 describe('ManageUserController', () => {
   let app: INestApplication;
@@ -225,7 +227,12 @@ describe('ManageUserController', () => {
           provide: UserService,
           useValue: userServiceMock,
         },
+        {
+          provide: APP_GUARD,
+          useClass: RoleGuard, // Apply RolesGuard globally
+        },
       ],
+      imports: [],
     }).compile();
 
     app = module.createNestApplication();
@@ -274,7 +281,7 @@ describe('ManageUserController', () => {
     await app.close();
   });
 
-  describe('GET /api/manage/users', () => {
+  describe('APIs:', () => {
     describe('GET /api/admin/users', () => {
       /**
        * Test Case: TC01_MUC_AllUsers_NoFilter
