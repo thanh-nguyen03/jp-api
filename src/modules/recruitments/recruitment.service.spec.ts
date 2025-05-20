@@ -145,7 +145,7 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
   // ### Test Case Set 1: Create Recruitment
   describe('createRecruitment', () => {
     /**
-     * #### TC-CR-001: Valid Recruitment Creation with All Required Fields
+     * #### TC-RS-001: Valid Recruitment Creation with All Required Fields
      * - **Goal:** Verify that a recruitment can be successfully created when all required fields are provided with valid data
      * - **Input:**
      *   ```json
@@ -155,7 +155,7 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
      *   - Recruitment is created and returned
      *   - AMQP message is emitted
      */
-    it('TC-CR-001: Valid Recruitment Creation with All Required Fields', async () => {
+    it('TC-RS-001: Valid Recruitment Creation with All Required Fields', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       (companyService.findById as jest.Mock).mockResolvedValue(company);
@@ -179,28 +179,28 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       expect(amqpServiceMock.emitMessage).toHaveBeenCalled();
     });
     /**
-     * #### TC-CR-002: Company Not Found
+     * #### TC-RS-002: Company Not Found
      * - **Goal:** Should throw NotFoundException if company does not exist
      * - **Input:**
      *   User with non-existent companyId, valid recruitment DTO
      * - **Expected Output:**
      *   - NotFoundException is thrown
      */
-    it('TC-CR-002: Company Not Found', async () => {
+    it('TC-RS-002: Company Not Found', async () => {
       (companyService.findById as jest.Mock).mockResolvedValue(null);
       const user = { companyId: 9999 } as User;
       const dto = { id: 0, title: 'TEST-REC-2', content: '', jobType: JobType.FULL_TIME, minSalary: 0, maxSalary: 0, experience: 0, deadline: new Date(), companyId: 9999, createdAt: new Date(), updatedAt: new Date() };
       await expect(recruitmentService.createRecruitment(dto, user)).rejects.toThrow(NotFoundException);
     });
     /**
-     * #### TC-CR-003: Invalid Input (Empty Title)
+     * #### TC-RS-003: Invalid Input (Empty Title)
      * - **Goal:** Should throw error for empty title
      * - **Input:**
      *   Recruitment DTO with empty title
      * - **Expected Output:**
      *   - Error is thrown
      */
-    it('TC-CR-003: Invalid Input (Empty Title)', async () => {
+    it('TC-RS-003: Invalid Input (Empty Title)', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       (companyService.findById as jest.Mock).mockResolvedValue(company);
@@ -208,28 +208,28 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       await expect(recruitmentService.createRecruitment(dto, user)).rejects.toThrow();
     });
     /**
-     * #### TC-CR-004: User Has No CompanyId
+     * #### TC-RS-004: User Has No CompanyId
      * - **Goal:** Should throw error if user has no companyId
      * - **Input:**
      *   User with companyId null, valid recruitment DTO
      * - **Expected Output:**
      *   - Error is thrown
      */
-    it('TC-CR-004: User Has No CompanyId', async () => {
+    it('TC-RS-004: User Has No CompanyId', async () => {
       (companyService.findById as jest.Mock).mockResolvedValue(null);
       const user = { companyId: null } as User;
       const dto = { id: 0, title: 'TEST-REC-3', content: '', jobType: JobType.FULL_TIME, minSalary: 0, maxSalary: 0, experience: 0, deadline: new Date(), companyId: null, createdAt: new Date(), updatedAt: new Date() };
       await expect(recruitmentService.createRecruitment(dto, user)).rejects.toThrow();
     });
     /**
-     * #### TC-CR-005: minSalary Greater Than maxSalary
+     * #### TC-RS-005: minSalary Greater Than maxSalary
      * - **Goal:** Should throw error if minSalary > maxSalary
      * - **Input:**
      *   Recruitment DTO with minSalary > maxSalary
      * - **Expected Output:**
      *   - Error is thrown
      */
-    it('TC-CR-005: minSalary Greater Than maxSalary', async () => {
+    it('TC-RS-005: minSalary Greater Than maxSalary', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       (companyService.findById as jest.Mock).mockResolvedValue(company);
@@ -249,14 +249,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       await expect(recruitmentService.createRecruitment(dto, user)).rejects.toThrow();
     });
     /**
-     * #### TC-CR-006: Deadline in the Past
+     * #### TC-RS-006: Deadline in the Past
      * - **Goal:** Should throw error if deadline is in the past
      * - **Input:**
      *   Recruitment DTO with past deadline
      * - **Expected Output:**
      *   - Error is thrown
      */
-    it('TC-CR-006: Deadline in the Past', async () => {
+    it('TC-RS-006: Deadline in the Past', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       (companyService.findById as jest.Mock).mockResolvedValue(company);
@@ -276,14 +276,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       await expect(recruitmentService.createRecruitment(dto, user)).rejects.toThrow();
     });
     /**
-     * #### TC-CR-007: Invalid JobType
+     * #### TC-RS-007: Invalid JobType
      * - **Goal:** Should throw error for invalid jobType
      * - **Input:**
      *   Recruitment DTO with invalid jobType
      * - **Expected Output:**
      *   - Error is thrown
      */
-    it('TC-CR-007: Invalid JobType', async () => {
+    it('TC-RS-007: Invalid JobType', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       (companyService.findById as jest.Mock).mockResolvedValue(company);
@@ -303,14 +303,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       await expect(recruitmentService.createRecruitment(dto as any, user)).rejects.toThrow();
     });
     /**
-     * #### TC-CR-008: Negative Experience
+     * #### TC-RS-008: Negative Experience
      * - **Goal:** Should throw error for negative experience
      * - **Input:**
      *   Recruitment DTO with negative experience
      * - **Expected Output:**
      *   - Error is thrown
      */
-    it('TC-CR-008: Negative Experience', async () => {
+    it('TC-RS-008: Negative Experience', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       (companyService.findById as jest.Mock).mockResolvedValue(company);
@@ -334,7 +334,7 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
   // ### Test Case Set 2: Update Recruitment
   describe('updateRecruitment', () => {
     /**
-     * #### TC-UR-001: Valid Recruitment Update
+     * #### TC-RS-009: Valid Recruitment Update
      * - **Goal:** Should update recruitment with valid data
      * - **Input:**
      *   Existing recruitment, updateData { title: 'Updated Title' }
@@ -342,7 +342,7 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
      *   - Recruitment title is updated
      *   - AMQP message is emitted
      */
-    it('TC-UR-001: Valid Recruitment Update', async () => {
+    it('TC-RS-009: Valid Recruitment Update', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       const recruitment = await prismaService.recruitment.create({
@@ -365,39 +365,39 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       expect(amqpServiceMock.emitMessage).toHaveBeenCalled();
     });
     /**
-     * #### TC-UR-002: Recruitment Not Found
+     * #### TC-RS-010: Recruitment Not Found
      * - **Goal:** Should throw NotFoundException if recruitment does not exist
      * - **Input:**
      *   Non-existent recruitmentId, updateData
      * - **Expected Output:**
      *   - NotFoundException is thrown
      */
-    it('TC-UR-002: Recruitment Not Found', async () => {
+    it('TC-RS-010: Recruitment Not Found', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       await expect(recruitmentService.updateRecruitment(99999, { title: 'X' }, user)).rejects.toThrow(NotFoundException);
     });
     /**
-     * #### TC-UR-003: User Has No CompanyId
+     * #### TC-RS-011: User Has No CompanyId
      * - **Goal:** Should throw ForbiddenException if user has no companyId
      * - **Input:**
      *   User with companyId null, updateData
      * - **Expected Output:**
      *   - ForbiddenException is thrown
      */
-    it('TC-UR-003: User Has No CompanyId', async () => {
+    it('TC-RS-011: User Has No CompanyId', async () => {
       const user = { companyId: null } as User;
       await expect(recruitmentService.updateRecruitment(1, { title: 'X' }, user)).rejects.toThrow(ForbiddenException);
     });
     /**
-     * #### TC-UR-004: Recruitment Belongs to Another Company
+     * #### TC-RS-012: Recruitment Belongs to Another Company
      * - **Goal:** Should throw ForbiddenException if recruitment belongs to another company
      * - **Input:**
      *   User from company1, recruitment from company2
      * - **Expected Output:**
      *   - ForbiddenException is thrown
      */
-    it('TC-UR-004: Recruitment Belongs to Another Company', async () => {
+    it('TC-RS-012: Recruitment Belongs to Another Company', async () => {
       const company1 = await createTestCompany();
       const company2 = await createTestCompany();
       const user = await createTestUser(company1.id, Role.COMPANY_ADMIN);
@@ -418,14 +418,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       await expect(recruitmentService.updateRecruitment(recruitment.id, { title: 'X' }, user)).rejects.toThrow(ForbiddenException);
     });
     /**
-     * #### TC-UR-005: Empty Update Data
+     * #### TC-RS-013: Empty Update Data
      * - **Goal:** Should not change anything if update data is empty
      * - **Input:**
      *   Existing recruitment, updateData {}
      * - **Expected Output:**
      *   - Recruitment remains unchanged
      */
-    it('TC-UR-005: Empty Update Data', async () => {
+    it('TC-RS-013: Empty Update Data', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       const recruitment = await prismaService.recruitment.create({
@@ -446,14 +446,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       expect(result.title).toBe('TEST-REC-EMPTY-UPD');
     });
     /**
-     * #### TC-UR-006: minSalary Greater Than maxSalary
+     * #### TC-RS-014: minSalary Greater Than maxSalary
      * - **Goal:** Should throw error if minSalary > maxSalary
      * - **Input:**
      *   updateData { minSalary: 3000, maxSalary: 2000 }
      * - **Expected Output:**
      *   - Error is thrown
      */
-    it('TC-UR-006: minSalary Greater Than maxSalary', async () => {
+    it('TC-RS-014: minSalary Greater Than maxSalary', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       const recruitment = await prismaService.recruitment.create({
@@ -473,14 +473,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       await expect(recruitmentService.updateRecruitment(recruitment.id, { minSalary: 3000, maxSalary: 2000 }, user)).rejects.toThrow();
     });
     /**
-     * #### TC-UR-007: Deadline in the Past
+     * #### TC-RS-015: Deadline in the Past
      * - **Goal:** Should throw error if deadline is in the past
      * - **Input:**
      *   updateData { deadline: past date }
      * - **Expected Output:**
      *   - Error is thrown
      */
-    it('TC-UR-007: Deadline in the Past', async () => {
+    it('TC-RS-015: Deadline in the Past', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       const recruitment = await prismaService.recruitment.create({
@@ -500,14 +500,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       await expect(recruitmentService.updateRecruitment(recruitment.id, { deadline: new Date(Date.now() - 1000000) }, user)).rejects.toThrow();
     });
     /**
-     * #### TC-UR-008: Invalid JobType
+     * #### TC-RS-016: Invalid JobType
      * - **Goal:** Should throw error for invalid jobType
      * - **Input:**
      *   updateData { jobType: 'INVALID_JOBTYPE' }
      * - **Expected Output:**
      *   - Error is thrown
      */
-    it('TC-UR-008: Invalid JobType', async () => {
+    it('TC-RS-016: Invalid JobType', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       const recruitment = await prismaService.recruitment.create({
@@ -531,7 +531,7 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
   // ### Test Case Set 3: Delete Recruitment
   describe('deleteRecruitment', () => {
     /**
-     * #### TC-DR-001: Valid Recruitment Deletion
+     * #### TC-RS-017: Valid Recruitment Deletion
      * - **Goal:** Should delete recruitment (happy path)
      * - **Input:**
      *   Existing recruitment, valid user
@@ -539,7 +539,7 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
      *   - Recruitment is deleted
      *   - AMQP message is emitted
      */
-    it('TC-DR-001: Valid Recruitment Deletion', async () => {
+    it('TC-RS-017: Valid Recruitment Deletion', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       const recruitment = await prismaService.recruitment.create({
@@ -560,27 +560,27 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       expect(amqpServiceMock.emitMessage).toHaveBeenCalled();
     });
     /**
-     * #### TC-DR-002: Recruitment Not Found
+     * #### TC-RS-018: Recruitment Not Found
      * - **Goal:** Should throw NotFoundException if recruitment does not exist
      * - **Input:**
      *   Non-existent recruitmentId, valid user
      * - **Expected Output:**
      *   - NotFoundException is thrown
      */
-    it('TC-DR-002: Recruitment Not Found', async () => {
+    it('TC-RS-018: Recruitment Not Found', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       await expect(recruitmentService.deleteRecruitment(99999, user)).rejects.toThrow(NotFoundException);
     });
     /**
-     * #### TC-DR-003: Recruitment Belongs to Another Company
+     * #### TC-RS-019: Recruitment Belongs to Another Company
      * - **Goal:** Should throw ForbiddenException if recruitment belongs to another company
      * - **Input:**
      *   User from company1, recruitment from company2
      * - **Expected Output:**
      *   - ForbiddenException is thrown
      */
-    it('TC-DR-003: Recruitment Belongs to Another Company', async () => {
+    it('TC-RS-019: Recruitment Belongs to Another Company', async () => {
       const company1 = await createTestCompany();
       const company2 = await createTestCompany();
       const user = await createTestUser(company1.id, Role.COMPANY_ADMIN);
@@ -601,26 +601,26 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       await expect(recruitmentService.deleteRecruitment(recruitment.id, user)).rejects.toThrow(ForbiddenException);
     });
     /**
-     * #### TC-DR-004: User Has No CompanyId
+     * #### TC-RS-020: User Has No CompanyId
      * - **Goal:** Should throw ForbiddenException if user has no companyId
      * - **Input:**
      *   User with companyId null
      * - **Expected Output:**
      *   - ForbiddenException is thrown
      */
-    it('TC-DR-004: User Has No CompanyId', async () => {
+    it('TC-RS-020: User Has No CompanyId', async () => {
       const user = { companyId: null } as User;
       await expect(recruitmentService.deleteRecruitment(1, user)).rejects.toThrow(ForbiddenException);
     });
     /**
-     * #### TC-DR-005: User Not Company Admin/HR
+     * #### TC-RS-021: User Not Company Admin/HR
      * - **Goal:** Should throw ForbiddenException if user is not company admin/HR
      * - **Input:**
      *   User with role USER
      * - **Expected Output:**
      *   - ForbiddenException is thrown
      */
-    it('TC-DR-005: User Not Company Admin/HR', async () => {
+    it('TC-RS-021: User Not Company Admin/HR', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.USER);
       const recruitment = await prismaService.recruitment.create({
@@ -640,14 +640,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       await expect(recruitmentService.deleteRecruitment(recruitment.id, user)).rejects.toThrow(ForbiddenException);
     });
     /**
-     * #### TC-DR-006: User From Different Company
+     * #### TC-RS-022: User From Different Company
      * - **Goal:** Should throw ForbiddenException if user is from a different company
      * - **Input:**
      *   User from company1, recruitment from company2
      * - **Expected Output:**
      *   - ForbiddenException is thrown
      */
-    it('TC-DR-006: User From Different Company', async () => {
+    it('TC-RS-022: User From Different Company', async () => {
       const company1 = await createTestCompany();
       const company2 = await createTestCompany();
       const user = await createTestUser(company1.id, Role.COMPANY_ADMIN);
@@ -672,14 +672,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
   // ### Test Case Set 4: Find All Recruitments
   describe('findAll', () => {
     /**
-     * #### TC-FR-001: Valid Filter (Happy Path)
+     * #### TC-RS-023: Valid Filter (Happy Path)
      * - **Goal:** Should return recruitments matching filter
      * - **Input:**
      *   Valid filter object
      * - **Expected Output:**
      *   - Array of matching recruitments
      */
-    it('TC-FR-001: Valid Filter (Happy Path)', async () => {
+    it('TC-RS-023: Valid Filter (Happy Path)', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       await prismaService.recruitment.create({
@@ -701,14 +701,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       expect(result.data.some(r => r.title === 'TEST-REC-FILTER')).toBe(true);
     });
     /**
-     * #### TC-FR-002: No Matching Recruitments
+     * #### TC-RS-024: No Matching Recruitments
      * - **Goal:** Should return empty array if no recruitments match filter
      * - **Input:**
      *   Filter with no matches
      * - **Expected Output:**
      *   - Empty array
      */
-    it('TC-FR-002: No Matching Recruitments', async () => {
+    it('TC-RS-024: No Matching Recruitments', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       const filter: RecruitmentFilter = { title: 'NO-MATCH', jobType: 'FULL_TIME', companyId: company.id, minSalary: 1000, maxSalary: 2000, experience: 2, limit: 10, offset: 0, sort: [] };
@@ -716,14 +716,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       expect(result.data).toEqual([]);
     });
     /**
-     * #### TC-FR-003: Special/Unicode Characters in Filter
+     * #### TC-RS-025: Special/Unicode Characters in Filter
      * - **Goal:** Should handle filter with special/unicode characters
      * - **Input:**
      *   Filter with special/unicode title
      * - **Expected Output:**
      *   - Empty array
      */
-    it('TC-FR-003: Special/Unicode Characters in Filter', async () => {
+    it('TC-RS-025: Special/Unicode Characters in Filter', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       const filter: RecruitmentFilter = { title: '公司-测试-🚀', jobType: 'FULL_TIME', companyId: company.id, minSalary: 1000, maxSalary: 2000, experience: 2, limit: 10, offset: 0, sort: [] };
@@ -731,14 +731,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       expect(result.data).toEqual([]);
     });
     /**
-     * #### TC-FR-004: Extremely Large Offset/Limit
+     * #### TC-RS-026: Extremely Large Offset/Limit
      * - **Goal:** Should handle extremely large offset/limit
      * - **Input:**
      *   Filter with large offset/limit
      * - **Expected Output:**
      *   - Returns correct offset/limit
      */
-    it('TC-FR-004: Extremely Large Offset/Limit', async () => {
+    it('TC-RS-026: Extremely Large Offset/Limit', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       const filter: RecruitmentFilter = { title: '', jobType: undefined, companyId: company.id, minSalary: 0, maxSalary: 0, experience: 0, limit: 1e6, offset: 1e6, sort: [] };
@@ -747,14 +747,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       expect(result.limit).toBe(1e6);
     });
     /**
-     * #### TC-FR-005: Negative minSalary/maxSalary/experience
+     * #### TC-RS-027: Negative minSalary/maxSalary/experience
      * - **Goal:** Should handle negative minSalary/maxSalary/experience
      * - **Input:**
      *   Filter with negative values
      * - **Expected Output:**
      *   - Empty array
      */
-    it('TC-FR-005: Negative minSalary/maxSalary/experience', async () => {
+    it('TC-RS-027: Negative minSalary/maxSalary/experience', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       const filter: RecruitmentFilter = { title: '', jobType: undefined, companyId: company.id, minSalary: -100, maxSalary: -200, experience: -1, limit: 10, offset: 0, sort: [] };
@@ -762,14 +762,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       expect(result.data).toEqual([]);
     });
     /**
-     * #### TC-FR-006: minSalary Greater Than maxSalary
+     * #### TC-RS-028: minSalary Greater Than maxSalary
      * - **Goal:** Should handle minSalary > maxSalary
      * - **Input:**
      *   Filter with minSalary > maxSalary
      * - **Expected Output:**
      *   - Empty array
      */
-    it('TC-FR-006: minSalary Greater Than maxSalary', async () => {
+    it('TC-RS-028: minSalary Greater Than maxSalary', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       const filter: RecruitmentFilter = { title: '', jobType: undefined, companyId: company.id, minSalary: 2000, maxSalary: 1000, experience: 2, limit: 10, offset: 0, sort: [] };
@@ -777,14 +777,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       expect(result.data).toEqual([]);
     });
     /**
-     * #### TC-FR-007: Deadline in the Past
+     * #### TC-RS-029: Deadline in the Past
      * - **Goal:** Should handle deadline in the past (should not return future jobs)
      * - **Input:**
      *   Filter with past deadline
      * - **Expected Output:**
      *   - Empty array
      */
-    it('TC-FR-007: Deadline in the Past', async () => {
+    it('TC-RS-029: Deadline in the Past', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       await prismaService.recruitment.create({
@@ -806,14 +806,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       expect(result.data).toEqual([]);
     });
     /**
-     * #### TC-FR-008: Invalid JobType
+     * #### TC-RS-030: Invalid JobType
      * - **Goal:** Should handle invalid jobType
      * - **Input:**
      *   Filter with invalid jobType
      * - **Expected Output:**
      *   - Empty array
      */
-    it('TC-FR-008: Invalid JobType', async () => {
+    it('TC-RS-030: Invalid JobType', async () => {
       const company = await createTestCompany();
       const user = await createTestUser(company.id, Role.COMPANY_ADMIN);
       const filter: RecruitmentFilter = { title: '', jobType: 'INVALID_JOBTYPE' as any, companyId: company.id, minSalary: 1000, maxSalary: 2000, experience: 2, limit: 10, offset: 0, sort: [] };
@@ -825,14 +825,14 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
   // ### Test Case Set 5: Find Recruitment by ID
   describe('findById', () => {
     /**
-     * #### TC-FRID-001: Valid ID (Happy Path)
+     * #### TC-RS-031: Valid ID (Happy Path)
      * - **Goal:** Should return recruitment for valid ID
      * - **Input:**
      *   Valid recruitment ID
      * - **Expected Output:**
      *   - Recruitment is returned
      */
-    it('TC-FRID-001: Valid ID (Happy Path)', async () => {
+    it('TC-RS-031: Valid ID (Happy Path)', async () => {
       const company = await createTestCompany();
       const recruitment = await prismaService.recruitment.create({
         data: {
@@ -852,70 +852,70 @@ describe('RecruitmentServiceImpl (Integration, Real DB)', () => {
       expect(result).toMatchObject({ id: recruitment.id, title: 'TEST-REC-BYID' });
     });
     /**
-     * #### TC-FRID-002: Non-existent ID
+     * #### TC-RS-032: Non-existent ID
      * - **Goal:** Should throw NotFoundException for non-existent ID
      * - **Input:**
      *   Non-existent recruitment ID
      * - **Expected Output:**
      *   - NotFoundException is thrown
      */
-    it('TC-FRID-002: Non-existent ID', async () => {
+    it('TC-RS-032: Non-existent ID', async () => {
       await expect(recruitmentService.findById(99999)).rejects.toThrow(NotFoundException);
     });
     /**
-     * #### TC-FRID-003: Negative ID
+     * #### TC-RS-033: Negative ID
      * - **Goal:** Should throw NotFoundException for negative ID
      * - **Input:**
      *   Negative recruitment ID
      * - **Expected Output:**
      *   - NotFoundException is thrown
      */
-    it('TC-FRID-003: Negative ID', async () => {
+    it('TC-RS-033: Negative ID', async () => {
       await expect(recruitmentService.findById(-1)).rejects.toThrow(NotFoundException);
     });
     /**
-     * #### TC-FRID-004: Zero ID
+     * #### TC-RS-034: Zero ID
      * - **Goal:** Should throw NotFoundException for zero ID
      * - **Input:**
      *   Zero as recruitment ID
      * - **Expected Output:**
      *   - NotFoundException is thrown
      */
-    it('TC-FRID-004: Zero ID', async () => {
+    it('TC-RS-034: Zero ID', async () => {
       await expect(recruitmentService.findById(0)).rejects.toThrow(NotFoundException);
     });
     /**
-     * #### TC-FRID-005: ID is a String
+     * #### TC-RS-035: ID is a String
      * - **Goal:** Should throw error if ID is a string
      * - **Input:**
      *   String as recruitment ID
      * - **Expected Output:**
      *   - Error is thrown
      */
-    it('TC-FRID-005: ID is a String', async () => {
+    it('TC-RS-035: ID is a String', async () => {
       await expect(recruitmentService.findById('not-a-number' as any)).rejects.toThrow();
     });
     /**
-     * #### TC-FRID-006: ID is Null
+     * #### TC-RS-036: ID is Null
      * - **Goal:** Should throw error if ID is null
      * - **Input:**
      *   Null as recruitment ID
      * - **Expected Output:**
      *   - Error is thrown
      */
-    it('TC-FRID-006: ID is Null', async () => {
+    it('TC-RS-036: ID is Null', async () => {
       await expect(recruitmentService.findById(null as any)).rejects.toThrow();
     });
     /**
-     * #### TC-FRID-007: ID is Undefined
+     * #### TC-RS-037: ID is Undefined
      * - **Goal:** Should throw error if ID is undefined
      * - **Input:**
      *   Undefined as recruitment ID
      * - **Expected Output:**
      *   - Error is thrown
      */
-    it('TC-FRID-007: ID is Undefined', async () => {
+    it('TC-RS-037: ID is Undefined', async () => {
       await expect(recruitmentService.findById(undefined as any)).rejects.toThrow();
     });
   });
-}); 
+});
