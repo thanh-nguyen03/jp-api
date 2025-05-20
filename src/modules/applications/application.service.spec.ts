@@ -93,6 +93,51 @@ describe('ApplicationService', () => {
   };
 
   beforeEach(async () => {
+    // Clean up test data before each test using deleteMany with conditions
+    await prismaService.application.deleteMany({
+      where: {
+        OR: [
+          { message: { contains: 'thanhnd' } },
+          { message: { contains: 'tnd' } },
+        ],
+      },
+    });
+    await prismaService.file.deleteMany({
+      where: {
+        OR: [
+          { id: { contains: 'thanhnd' } },
+          { id: { contains: 'tnd' } },
+          { key: { contains: 'thanhnd' } },
+          { key: { contains: 'tnd' } },
+        ],
+      },
+    });
+    await prismaService.recruitment.deleteMany({
+      where: {
+        OR: [
+          { title: { contains: 'thanhnd' } },
+          { title: { contains: 'tnd' } },
+        ],
+      },
+    });
+    await prismaService.user.deleteMany({
+      where: {
+        OR: [
+          { email: { contains: 'thanhnd' } },
+          { email: { contains: 'tnd' } },
+        ],
+      },
+    });
+    await prismaService.company.deleteMany({
+      where: {
+        OR: [
+          { name: { contains: 'thanhnd' } },
+          { name: { contains: 'tnd' } },
+          { code: { contains: 'thanhnd' } },
+          { code: { contains: 'tnd' } },
+        ],
+      },
+    });
     // Reset test data IDs before each test
     testDataIds.users = [];
     testDataIds.companies = [];
@@ -102,66 +147,55 @@ describe('ApplicationService', () => {
   });
 
   afterEach(async () => {
-    // Clean up test data in the correct order to respect foreign key constraints
+    // Clean up test data after each test using deleteMany with conditions
     try {
-      // Delete applications first
-      for (const id of testDataIds.applications) {
-        await prismaService.application
-          .delete({
-            where: { id },
-          })
-          .catch(() => {
-            /* ignore errors */
-          });
-      }
-
-      // Delete files next
-      for (const id of testDataIds.files) {
-        await prismaService.file
-          .delete({
-            where: { id },
-          })
-          .catch(() => {
-            /* ignore errors */
-          });
-      }
-
-      // Delete recruitments
-      for (const id of testDataIds.recruitments) {
-        await prismaService.recruitment
-          .delete({
-            where: { id },
-          })
-          .catch(() => {
-            /* ignore errors */
-          });
-      }
-
-      // Delete all users first - we'll handle the foreign key constraints by using cascade delete
-      for (const id of testDataIds.users) {
-        await prismaService.user
-          .delete({
-            where: { id },
-          })
-          .catch(() => {
-            /* ignore errors */
-          });
-      }
-
-      // Delete companies
-      for (const id of testDataIds.companies) {
-        await prismaService.company
-          .delete({
-            where: { id },
-          })
-          .catch(() => {
-            /* ignore errors */
-          });
-      }
+      await prismaService.application.deleteMany({
+        where: {
+          OR: [
+            { message: { contains: 'thanhnd' } },
+            { message: { contains: 'tnd' } },
+          ],
+        },
+      });
+      await prismaService.file.deleteMany({
+        where: {
+          OR: [
+            { id: { contains: 'thanhnd' } },
+            { id: { contains: 'tnd' } },
+            { key: { contains: 'thanhnd' } },
+            { key: { contains: 'tnd' } },
+          ],
+        },
+      });
+      await prismaService.recruitment.deleteMany({
+        where: {
+          OR: [
+            { title: { contains: 'thanhnd' } },
+            { title: { contains: 'tnd' } },
+          ],
+        },
+      });
+      await prismaService.user.deleteMany({
+        where: {
+          OR: [
+            { email: { contains: 'thanhnd' } },
+            { email: { contains: 'tnd' } },
+          ],
+        },
+      });
+      await prismaService.company.deleteMany({
+        where: {
+          OR: [
+            { name: { contains: 'thanhnd' } },
+            { name: { contains: 'tnd' } },
+            { code: { contains: 'thanhnd' } },
+            { code: { contains: 'tnd' } },
+          ],
+        },
+      });
     } catch (error) {
       console.error('Error during test cleanup:', error);
     }
-
     jest.clearAllMocks();
   });
 
@@ -303,8 +337,8 @@ describe('ApplicationService', () => {
       // Create a recruitment with a past deadline
       const expiredRecruitment = await prismaService.recruitment.create({
         data: {
-          title: `Expired Recruitment ${Date.now()}`,
-          content: 'Test content',
+          title: `Expired Recruitment thanhnd ${Date.now()}`,
+          content: 'Test content thanhnd',
           maxSalary: 1000,
           minSalary: 500,
           experience: 1,
@@ -320,7 +354,7 @@ describe('ApplicationService', () => {
       testDataIds.recruitments.push(expiredRecruitment.id);
 
       const createDto: CreateApplicationDto = {
-        message: 'Test application',
+        message: 'Test application_thanhnd',
         cvId: testFile.id,
         recruitmentId: expiredRecruitment.id,
       };
@@ -336,7 +370,7 @@ describe('ApplicationService', () => {
       const { testRecruitment, testFile } = await createTestData();
 
       const createDto: CreateApplicationDto = {
-        message: 'Test application',
+        message: 'Test application_thanhnd',
         cvId: testFile.id,
         recruitmentId: testRecruitment.id,
       };
@@ -352,7 +386,7 @@ describe('ApplicationService', () => {
         await createTestData();
 
       const createDto: CreateApplicationDto = {
-        message: 'Test application',
+        message: 'Test application_thanhnd',
         cvId: testFile.id,
         recruitmentId: testRecruitment.id,
       };
@@ -368,7 +402,7 @@ describe('ApplicationService', () => {
       const { testUser, testFile } = await createTestData();
 
       const createDto: CreateApplicationDto = {
-        message: 'Test application',
+        message: 'Test application_thanhnd',
         cvId: testFile.id,
         recruitmentId: 9999, // Non-existent recruitment ID
       };
@@ -382,7 +416,7 @@ describe('ApplicationService', () => {
       const { testUser, testRecruitment } = await createTestData();
 
       const createDto: CreateApplicationDto = {
-        message: 'Test application',
+        message: 'Test application_thanhnd',
         cvId: 'non-existent-cv-id',
         recruitmentId: testRecruitment.id,
       };
@@ -400,7 +434,7 @@ describe('ApplicationService', () => {
       // Create an initial application
       const initialApplication = await prismaService.application.create({
         data: {
-          message: 'Initial application',
+          message: 'Initial application thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -411,7 +445,7 @@ describe('ApplicationService', () => {
 
       // Try to create another application for the same recruitment
       const createDto: CreateApplicationDto = {
-        message: 'Second application',
+        message: 'Second application thanhnd',
         cvId: testFile.id,
         recruitmentId: testRecruitment.id,
       };
@@ -435,7 +469,7 @@ describe('ApplicationService', () => {
       // Create multiple applications individually to track IDs
       const app1 = await prismaService.application.create({
         data: {
-          message: 'Application 1',
+          message: 'Application 1 thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -446,7 +480,7 @@ describe('ApplicationService', () => {
 
       const app2 = await prismaService.application.create({
         data: {
-          message: 'Application 2',
+          message: 'Application 2 thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -478,7 +512,7 @@ describe('ApplicationService', () => {
       // Create an application
       const application = await prismaService.application.create({
         data: {
-          message: 'Test application',
+          message: 'Test application thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -523,7 +557,7 @@ describe('ApplicationService', () => {
       // Create an application for testUser
       const application = await prismaService.application.create({
         data: {
-          message: 'Test application',
+          message: 'Test application_thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -555,7 +589,7 @@ describe('ApplicationService', () => {
       // Create multiple applications individually to track IDs
       const app1 = await prismaService.application.create({
         data: {
-          message: 'Application 1',
+          message: 'Application 1 thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -566,7 +600,7 @@ describe('ApplicationService', () => {
 
       const app2 = await prismaService.application.create({
         data: {
-          message: 'Application 2',
+          message: 'Application 2 thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -631,10 +665,10 @@ describe('ApplicationService', () => {
       // Create a different company
       const otherCompany = await prismaService.company.create({
         data: {
-          name: `Other Company ${Date.now()}`,
-          code: `OTHER_${Date.now()}`,
-          description: 'Other description',
-          address: 'Other address',
+          name: `Other Company thanhnd ${Date.now()}`,
+          code: `OTHER_thanhnd_${Date.now()}`,
+          description: 'Other description thanhnd',
+          address: 'Other address thanhnd',
         },
       });
       testDataIds.companies.push(otherCompany.id);
@@ -666,7 +700,7 @@ describe('ApplicationService', () => {
       // Create an application
       const application = await prismaService.application.create({
         data: {
-          message: 'Test application',
+          message: 'Test application_thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -706,7 +740,7 @@ describe('ApplicationService', () => {
       // Create an application
       const application = await prismaService.application.create({
         data: {
-          message: 'Test application',
+          message: 'Test application_thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -738,7 +772,7 @@ describe('ApplicationService', () => {
       // Create an application
       const application = await prismaService.application.create({
         data: {
-          message: 'Test application',
+          message: 'Test application_thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -765,7 +799,7 @@ describe('ApplicationService', () => {
       // Create an application
       const application = await prismaService.application.create({
         data: {
-          message: 'Test application',
+          message: 'Test application_thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -777,10 +811,10 @@ describe('ApplicationService', () => {
       // Create a different company
       const otherCompany = await prismaService.company.create({
         data: {
-          name: `Other Company ${Date.now()}`,
-          code: `OTHER_${Date.now()}`,
-          description: 'Other description',
-          address: 'Other address',
+          name: `Other Company thanhnd ${Date.now()}`,
+          code: `OTHER_thanhnd_${Date.now()}`,
+          description: 'Other description thanhnd',
+          address: 'Other address thanhnd',
         },
       });
       testDataIds.companies.push(otherCompany.id);
@@ -814,7 +848,7 @@ describe('ApplicationService', () => {
       // Create an application
       const application = await prismaService.application.create({
         data: {
-          message: 'Test application',
+          message: 'Test application_thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -858,7 +892,7 @@ describe('ApplicationService', () => {
       // Create an application
       const application = await prismaService.application.create({
         data: {
-          message: 'Test application',
+          message: 'Test application_thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -901,7 +935,7 @@ describe('ApplicationService', () => {
       // Create an application
       const application = await prismaService.application.create({
         data: {
-          message: 'Test application',
+          message: 'Test application_thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -933,7 +967,7 @@ describe('ApplicationService', () => {
       // Create an application
       const application = await prismaService.application.create({
         data: {
-          message: 'Test application',
+          message: 'Test application_thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -962,7 +996,7 @@ describe('ApplicationService', () => {
       // Create an application
       const application = await prismaService.application.create({
         data: {
-          message: 'Test application',
+          message: 'Test application_thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -1005,7 +1039,7 @@ describe('ApplicationService', () => {
       // Create an application
       const application = await prismaService.application.create({
         data: {
-          message: 'Test application',
+          message: 'Test application_thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -1017,10 +1051,10 @@ describe('ApplicationService', () => {
       // Create a different company
       const otherCompany = await prismaService.company.create({
         data: {
-          name: `Other Company ${Date.now()}`,
-          code: `OTHER_${Date.now()}`,
-          description: 'Other description',
-          address: 'Other address',
+          name: `Other Company thanhnd ${Date.now()}`,
+          code: `OTHER_thanhnd_${Date.now()}`,
+          description: 'Other description thanhnd',
+          address: 'Other address thanhnd',
         },
       });
       testDataIds.companies.push(otherCompany.id);
@@ -1036,7 +1070,6 @@ describe('ApplicationService', () => {
               id: otherCompany.id,
             },
           },
-          user: testUser,
         } as any);
 
       await expect(
@@ -1054,7 +1087,7 @@ describe('ApplicationService', () => {
       // Create an application
       const application = await prismaService.application.create({
         data: {
-          message: 'Test application',
+          message: 'Test application_thanhnd',
           status: $Enums.ApplicationStatus.PENDING,
           cvId: testFile.id,
           recruitmentId: testRecruitment.id,
@@ -1064,7 +1097,7 @@ describe('ApplicationService', () => {
       testDataIds.applications.push(application.id);
 
       const updateDto: UpdateApplicationDto = {
-        message: 'Updated application',
+        message: 'Updated application_thanhnd',
         cvId: testFile.id,
         status: $Enums.ApplicationStatus.APPROVED,
       };
@@ -1073,7 +1106,7 @@ describe('ApplicationService', () => {
 
       expect(result).toBeDefined();
       expect(result.id).toBe(application.id);
-      expect(result.message).toBe('Updated application');
+      expect(result.message).toBe('Updated application_thanhnd');
       expect(result.status).toBe($Enums.ApplicationStatus.APPROVED);
 
       // Verify the application was updated in the database
@@ -1084,7 +1117,7 @@ describe('ApplicationService', () => {
       });
 
       expect(updatedApplication).toBeDefined();
-      expect(updatedApplication.message).toBe('Updated application');
+      expect(updatedApplication.message).toBe('Updated application_thanhnd');
       expect(updatedApplication.status).toBe($Enums.ApplicationStatus.APPROVED);
     });
 
@@ -1092,7 +1125,7 @@ describe('ApplicationService', () => {
       const { testFile } = await createTestData();
 
       const updateDto: UpdateApplicationDto = {
-        message: 'Updated application',
+        message: 'Updated application_thanhnd',
         cvId: testFile.id,
         status: $Enums.ApplicationStatus.APPROVED,
       };

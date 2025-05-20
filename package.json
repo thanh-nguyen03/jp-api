@@ -87,8 +87,23 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "coverageReporters": [
+      "json",
+      "html"
+    ],
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!**/templates/**/*.ts",
+      "!**/amqp/**/*.ts",
+      "!**/modules/auth/**/*.ts",
+      "!**/modules/files/**/*.ts",
+      "!**/interceptors/**/*.ts",
+      "!**/middleware/**/*.ts",
+      "!**/exceptions/**/*.ts",
+      "!**/middlewares/**/*.ts",
+      "!**/*.module.ts",
+      "!**/environments/**/*.ts",
+      "!**/main.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
