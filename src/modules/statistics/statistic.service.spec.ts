@@ -230,15 +230,15 @@ describe('StatisticServiceImpl - getCompanyCommonStatistics (Integration Tests w
     return user;
   }
 
-  // TC01: All count results are 0 (empty company)
-  describe('TC01: All count results are 0 (empty company)', () => {
+  /**
+   * Test Case: TC1_SS_EmptyCompany
+   * Objective: Verify that a company with no recruitments or applications returns zero counts
+   * Input: Company with 1 HR, 0 recruitments, 0 applications
+   * Expected Output: CompanyStatisticsDto with totalRecruitments: 0, totalApplications: {total: 0, pending: 0, accepted: 0, rejected: 0}, totalHRs: 1
+   * Notes: Tests zero-count branches and DTO construction in getCompanyCommonStatistics
+   */
+  describe('TC1_SS_EmptyCompany', () => {
     it('should return CompanyStatisticsDto with all zeros', async () => {
-      /**
-       * Test Case ID: TC01
-       * Description: All count results are 0 (empty company)
-       * Covered: Lines 2–17, all count branches return 0, DTO construction
-       */
-      // Arrange
       const user = await createTestData({
         companyName: `test-company-${Date.now()}`,
         hrCount: 1, // Minimum 1 for user
@@ -265,14 +265,15 @@ describe('StatisticServiceImpl - getCompanyCommonStatistics (Integration Tests w
     });
   });
 
-  // TC02: All counts return valid (>0) values
-  describe('TC02: All counts return valid (>0) values', () => {
+  /**
+   * Test Case: TC2_SS_ValidCounts
+   * Objective: Verify that a company with multiple HRs, recruitments, and applications returns correct counts
+   * Input: Company with 2 HRs, 3 recruitments, 2 pending, 2 approved, 2 rejected applications
+   * Expected Output: CompanyStatisticsDto with totalRecruitments: 3, totalApplications: {total: 6, pending: 2, accepted: 2, rejected: 2}, totalHRs: 2
+   * Notes: Tests normal execution path and all count branches in getCompanyCommonStatistics
+   */
+  describe('TC2_SS_ValidCounts', () => {
     it('should return CompanyStatisticsDto with valid counts', async () => {
-      /**
-       * Test Case ID: TC02
-       * Description: All counts return valid (>0) values
-       * Covered: Normal execution path, all lines and count branches
-       */
       // Arrange
       const user = await createTestData({
         companyName: `test-company-${Date.now()}`,
@@ -300,14 +301,15 @@ describe('StatisticServiceImpl - getCompanyCommonStatistics (Integration Tests w
     }, 15000); // Increased timeout to 15 seconds
   });
 
-  // TC03: Only PENDING applications exist
-  describe('TC03: Only PENDING applications exist', () => {
+  /**
+   * Test Case: TC3_SS_PendingOnly
+   * Objective: Verify that a company with only pending applications returns correct counts
+   * Input: Company with 1 HR, 1 recruitment, 3 pending applications
+   * Expected Output: CompanyStatisticsDto with totalRecruitments: 1, totalApplications: {total: 3, pending: 3, accepted: 0, rejected: 0}, totalHRs: 1
+   * Notes: Tests PENDING status branch in getCompanyCommonStatistics
+   */
+  describe('TC3_SS_PendingOnly', () => {
     it('should return CompanyStatisticsDto with only pending applications', async () => {
-      /**
-       * Test Case ID: TC03
-       * Description: Only PENDING applications exist
-       * Covered: status == 'PENDING' branch returns >0, APPROVED and REJECTED return 0
-       */
       // Arrange
       const user = await createTestData({
         companyName: `test-company-${Date.now()}`,
@@ -335,14 +337,15 @@ describe('StatisticServiceImpl - getCompanyCommonStatistics (Integration Tests w
     });
   });
 
-  // TC04: Only APPROVED and PENDING applications exist
-  describe('TC04: Only APPROVED and PENDING applications exist', () => {
+  /**
+   * Test Case: TC4_SS_PendingAndApproved
+   * Objective: Verify that a company with pending and approved applications returns correct counts
+   * Input: Company with 1 HR, 1 recruitment, 2 pending, 3 approved applications
+   * Expected Output: CompanyStatisticsDto with totalRecruitments: 1, totalApplications: {total: 5, pending: 2, accepted: 3, rejected: 0}, totalHRs: 1
+   * Notes: Tests PENDING and APPROVED branches in getCompanyCommonStatistics
+   */
+  describe('TC4_SS_PendingAndApproved', () => {
     it('should return CompanyStatisticsDto with pending and approved applications', async () => {
-      /**
-       * Test Case ID: TC04
-       * Description: Only APPROVED and PENDING applications exist
-       * Covered: PENDING, APPROVED branches with values, REJECTED with 0
-       */
       // Arrange
       const user = await createTestData({
         companyName: `test-company-${Date.now()}`,
@@ -370,14 +373,15 @@ describe('StatisticServiceImpl - getCompanyCommonStatistics (Integration Tests w
     });
   });
 
-  // TC05: Only REJECTED applications exist
-  describe('TC05: Only REJECTED applications exist', () => {
+  /**
+   * Test Case: TC5_SS_RejectedOnly
+   * Objective: Verify that a company with only rejected applications returns correct counts
+   * Input: Company with 1 HR, 1 recruitment, 2 rejected applications
+   * Expected Output: CompanyStatisticsDto with totalRecruitments: 1, totalApplications: {total: 2, pending: 0, accepted: 0, rejected: 2}, totalHRs: 1
+   * Notes: Tests REJECTED status branch in getCompanyCommonStatistics
+   */
+  describe('TC5_SS_RejectedOnly', () => {
     it('should return CompanyStatisticsDto with only rejected applications', async () => {
-      /**
-       * Test Case ID: TC05
-       * Description: Only REJECTED applications exist
-       * Covered: REJECTED branch returns value, others return 0
-       */
       // Arrange
       const user = await createTestData({
         companyName: `test-company-${Date.now()}`,
@@ -405,14 +409,15 @@ describe('StatisticServiceImpl - getCompanyCommonStatistics (Integration Tests w
     });
   });
 
-  // TC06: No HRs in company
-  describe('TC06: No HRs in company', () => {
+  /**
+   * Test Case: TC6_SS_NoHRs
+   * Objective: Verify that a company with no HRs (except the user) returns correct counts
+   * Input: Company with 0 HRs, 1 recruitment, 1 pending, 1 approved, 1 rejected application
+   * Expected Output: CompanyStatisticsDto with totalRecruitments: 1, totalApplications: {total: 3, pending: 1, accepted: 1, rejected: 1}, totalHRs: 1
+   * Notes: Tests HR count branch with user as the only HR in getCompanyCommonStatistics
+   */
+  describe('TC6_SS_NoHRs', () => {
     it('should return CompanyStatisticsDto with zero HRs', async () => {
-      /**
-       * Test Case ID: TC06
-       * Description: No HRs in company
-       * Covered: user.count(...) returns 0, HR count branch
-       */
       // Arrange
       const user = await createTestData({
         companyName: `test-company-${Date.now()}`,
@@ -440,14 +445,15 @@ describe('StatisticServiceImpl - getCompanyCommonStatistics (Integration Tests w
     });
   });
 
-  // TC07: Multiple HRs in company
-  describe('TC07: Multiple HRs in company', () => {
+  /**
+   * Test Case: TC7_SS_MultipleHRs
+   * Objective: Verify that a company with multiple HRs returns correct counts
+   * Input: Company with 3 HRs, 1 recruitment, 1 pending, 1 approved, 1 rejected application
+   * Expected Output: CompanyStatisticsDto with totalRecruitments: 1, totalApplications: {total: 3, pending: 1, accepted: 1, rejected: 1}, totalHRs: 3
+   * Notes: Tests HR count branch with multiple HRs in getCompanyCommonStatistics
+   */
+  describe('TC7_SS_MultipleHRs', () => {
     it('should return CompanyStatisticsDto with multiple HRs', async () => {
-      /**
-       * Test Case ID: TC07
-       * Description: Multiple HRs in company
-       * Covered: HR count line with value >0
-       */
       // Arrange
       const user = await createTestData({
         companyName: `test-company-${Date.now()}`,
@@ -475,14 +481,15 @@ describe('StatisticServiceImpl - getCompanyCommonStatistics (Integration Tests w
     });
   });
 
-  // TC09: Verify correct Prisma query filters
-  describe('TC08: Verify correct Prisma query filters', () => {
+  /**
+   * Test Case: TC8_SS_PrismaFilters
+   * Objective: Verify that Prisma query filters correctly retrieve counts for a company
+   * Input: Company with 2 HRs, 2 recruitments, 1 pending, 1 approved, 1 rejected application
+   * Expected Output: CompanyStatisticsDto with totalRecruitments: 2, totalApplications: {total: 3, pending: 1, accepted: 1, rejected: 1}, totalHRs: 2
+   * Notes: Tests companyId and status filters in getCompanyCommonStatistics
+   */
+  describe('TC8_SS_PrismaFilters', () => {
     it('should return correct counts with specific data setup', async () => {
-      /**
-       * Test Case ID: TC08
-       * Description: Verify correct Prisma query filters
-       * Covered: companyId, status: '...', recruitment.companyId
-       */
       // Arrange
       const user = await createTestData({
         companyName: `test-company-${Date.now()}`,
@@ -611,21 +618,6 @@ describe('StatisticServiceImpl - getAdminCommonStatistics (Integration Tests wit
     expect(residual.recruitments).toBe(0);
     expect(residual.applications).toBe(0);
 
-    // Check for interfering non-test data
-    // const nonTestData = {
-    //   fptCompanies: await prismaService.company.count({
-    //     where: { name: { contains: 'FPT' } },
-    //   }),
-    //   nonTestCompanies: await prismaService.company.count({
-    //     where: { name: { not: { contains: 'test-' } } },
-    //   }),
-    //   nonTestApplications: await prismaService.application.count({
-    //     where: {
-    //       recruitment: { company: { name: { not: { contains: 'test-' } } } },
-    //     },
-    //   }),
-    // };
-    // console.log('Non-test data in database:', nonTestData);
     console.log(`Cleanup took ${Date.now() - startTime}ms`);
   }, 20000);
 
@@ -921,7 +913,14 @@ describe('StatisticServiceImpl - getAdminCommonStatistics (Integration Tests wit
     };
   }
 
-  describe('TC1: Basic data exists', () => {
+  /**
+   * Test Case: TC9_SS_AdminBasicData
+   * Objective: Verify that admin statistics return correct counts for a company with data
+   * Input: 1 company, 1 HR, 5 recruitments, 1 pending application, 1 user created in January
+   * Expected Output: Top companies include test company with 5 recruitments and 1 pending application; user chart shows 1 user in January
+   * Notes: Tests company, recruitment, and application retrieval in getAdminCommonStatistics
+   */
+  describe('TC9_SS_AdminBasicData', () => {
     it('should return correct counts for test data', async () => {
       const { companies } = await createTestData({
         companyCount: 1,
@@ -995,7 +994,14 @@ describe('StatisticServiceImpl - getAdminCommonStatistics (Integration Tests wit
     }, 20000);
   });
 
-  describe('TC2: No users', () => {
+  /**
+   * Test Case: TC10_SS_AdminNoUsers
+   * Objective: Verify that admin statistics handle cases with no user data
+   * Input: 1 company, 1 HR, 5 recruitments, 0 applications, no users
+   * Expected Output: Top companies include test company with 5 recruitments and 0 applications; user chart shows 0 users
+   * Notes: Tests empty user chart statistics in getAdminCommonStatistics
+   */
+  describe('TC10_SS_AdminNoUsers', () => {
     it('should return correct user counts for test data', async () => {
       const { companies } = await createTestData({
         companyCount: 1,
@@ -1036,7 +1042,14 @@ describe('StatisticServiceImpl - getAdminCommonStatistics (Integration Tests wit
     }, 15000);
   });
 
-  describe('TC3: No companies', () => {
+  /**
+   * Test Case: TC11_SS_AdminNoCompanies
+   * Objective: Verify that admin statistics return no test companies when none are created
+   * Input: 0 companies, 0 HRs, 0 recruitments, 0 applications, 1 user
+   * Expected Output: Top companies list excludes test companies
+   * Notes: Tests empty company retrieval in getAdminCommonStatistics
+   */
+  describe('TC11_SS_AdminNoCompanies', () => {
     it('should return correct company counts for test data', async () => {
       await createTestData({
         companyCount: 0,
@@ -1057,7 +1070,15 @@ describe('StatisticServiceImpl - getAdminCommonStatistics (Integration Tests wit
     });
   });
 
-  describe('TC4: Applications by status = PENDING', () => {
+  /**
+   * Test Case: TC12_SS_AdminPendingApps
+   * Objective: Verify that admin statistics correctly handle pending applications
+   * Input: 1 company, 1 HR, 5 recruitments, 3 pending applications, 1 user
+   * Expected Output: Top companies include test company with 3 pending applications in the first recruitment
+   * Notes: Tests PENDING application retrieval in getAdminCommonStatistics
+   */
+
+  describe('TC12_SS_AdminPendingApps', () => {
     it('should return correct pending application counts', async () => {
       const { companies, firstRecruitmentId } = await createTestData({
         companyCount: 1,
@@ -1129,8 +1150,14 @@ describe('StatisticServiceImpl - getAdminCommonStatistics (Integration Tests wit
       });
     }, 20000);
   });
-
-  describe('TC5: Applications by status = APPROVED', () => {
+  /**
+   * Test Case: TC13_SS_AdminApprovedApps
+   * Objective: Verify that admin statistics correctly handle approved applications
+   * Input: 1 company, 1 HR, 5 recruitments, 3 approved applications, 1 user
+   * Expected Output: Top companies include test company with 3 approved applications in the first recruitment
+   * Notes: Tests APPROVED application retrieval in getAdminCommonStatistics
+   */
+  describe('TC13_SS_AdminApprovedApps   ', () => {
     it('should return correct approved application counts', async () => {
       const { companies, firstRecruitmentId } = await createTestData({
         companyCount: 1,
@@ -1203,7 +1230,14 @@ describe('StatisticServiceImpl - getAdminCommonStatistics (Integration Tests wit
     }, 20000);
   });
 
-  describe('TC6: Applications by status = REJECTED', () => {
+  /**
+   * Test Case: TC14_SS_AdminRejectedApps
+   * Objective: Verify that admin statistics correctly handle rejected applications
+   * Input: 1 company, 1 HR, 5 recruitments, 3 rejected applications, 1 user
+   * Expected Output: Top companies include test company with 3 rejected applications in the first recruitment
+   * Notes: Tests REJECTED application retrieval in getAdminCommonStatistics
+   */
+  describe('TC14_SS_AdminRejectedApps', () => {
     it('should return correct rejected application counts', async () => {
       const { companies, firstRecruitmentId } = await createTestData({
         companyCount: 1,
@@ -1276,7 +1310,15 @@ describe('StatisticServiceImpl - getAdminCommonStatistics (Integration Tests wit
     }, 20000);
   });
 
-  describe('TC7: Mixed application statuses', () => {
+  /**
+   * Test Case: TC15_SS_AdminMixedApps
+   * Objective: Verify that admin statistics correctly handle mixed application statuses
+   * Input: 1 company, 1 HR, 5 recruitments, 1 pending, 1 approved, 1 rejected application, 1 user
+   * Expected Output: Top companies include test company with 1 pending, 1 approved, 1 rejected application in the first recruitment
+   * Notes: Tests retrieval of multiple application statuses in getAdminCommonStatistics
+   */
+
+  describe('TC15_SS_AdminMixedApps', () => {
     it('should return correct mixed application counts', async () => {
       const { companies, firstRecruitmentId } = await createTestData({
         companyCount: 1,
@@ -1358,7 +1400,14 @@ describe('StatisticServiceImpl - getAdminCommonStatistics (Integration Tests wit
       });
     }, 20000);
   });
-  describe('TC8: Sort companies with different recruitment counts', () => {
+  /**
+   * Test Case: TC16_SS_AdminSortedCompanies
+   * Objective: Verify that admin statistics sort companies by recruitment count in descending order
+   * Input: 5 companies with 50, 40, 30, 25, 22 recruitments, 1 HR, 1 pending application, 1 user
+   * Expected Output: Top companies list test companies in order of 50, 40, 30, 25, 22 recruitments
+   * Notes: Tests sorting logic in getAdminCommonStatistics
+   */
+  describe('TC16_SS_AdminSortedCompanies', () => {
     it('should return test companies in descending recruitment order', async () => {
       const { companies } = await createTestData({
         companyCount: 5,
@@ -1436,7 +1485,14 @@ describe('StatisticServiceImpl - getAdminCommonStatistics (Integration Tests wit
     }, 20000);
   });
 
-  describe('TC9: Company with 0 recruitments', () => {
+  /**
+   * Test Case: TC17_SS_AdminNoRecruitments
+   * Objective: Verify that admin statistics exclude companies with 0 recruitments
+   * Input: 6 companies with 50, 40, 30, 25, 22, 0 recruitments, 1 HR, 1 pending application, 1 user
+   * Expected Output: Top companies include only 5 test companies with non-zero recruitments
+   * Notes: Tests filtering of companies with no recruitments in getAdminCommonStatistics
+   */
+  describe('TC17_SS_AdminNoRecruitments', () => {
     it('should not include test company with 0 recruitments', async () => {
       const { companies } = await createTestData({
         companyCount: 6,
@@ -1469,8 +1525,14 @@ describe('StatisticServiceImpl - getAdminCommonStatistics (Integration Tests wit
       );
     }, 20000);
   });
-
-  describe('TC10: All counts = 0', () => {
+  /**
+   * Test Case: TC18_SS_AdminNoData
+   * Objective: Verify that admin statistics return no test data when none is created
+   * Input: No test companies, users, recruitments, or applications
+   * Expected Output: Top companies exclude test companies; user chart reflects existing users
+   * Notes: Tests behavior with no test data in getAdminCommonStatistics
+   */
+  describe('TC18_SS_AdminNoData', () => {
     it('should not include test data when none created', async () => {
       const result = await statisticService.getAdminCommonStatistics();
 
@@ -1498,7 +1560,14 @@ describe('StatisticServiceImpl - getAdminCommonStatistics (Integration Tests wit
     });
   });
 
-  describe('TC11: All sections populated', () => {
+  /**
+   * Test Case: TC19_SS_AdminFullData
+   * Objective: Verify that admin statistics return correct counts and user chart with full data
+   * Input: 5 companies with 30, 25, 25, 22, 22 recruitments, 1 HR, 2 pending, 2 approved, 2 rejected applications, 5 users across months
+   * Expected Output: Top companies include 5 test companies; user chart shows users in January, February, March, April
+   * Notes: Tests full data retrieval and user chart population in getAdminCommonStatistics
+   */
+  describe('TC19_SS_AdminFullData', () => {
     it('should return correct counts and monthly breakdown for test data', async () => {
       const { companies } = await createTestData({
         companyCount: 5,

@@ -108,6 +108,7 @@ describe('UserServiceImpl - findAll (Same DB)', () => {
             },
           },
           { email: { contains: 'test-' } },
+          { email: { contains: '-example1.com' } },
           {
             email: {
               in: [
@@ -158,8 +159,14 @@ describe('UserServiceImpl - findAll (Same DB)', () => {
     avatar: null,
   });
 
-  // Test Case 2.3.1: Successfully retrieve users with name filter
-  describe('TC-2.3.1: Filter users by name', () => {
+  /**
+   * Test Case: TC01_US_FindAll_NameFilter
+   * Objective: Verify that findAll returns users matching the provided name filter
+   * Input: UserFilter { name: 'John', email: '', sort: [] }
+   * Expected Output: Array of UserDto objects with firstName and lastName containing 'John'
+   * Notes: Uses production database with cleanup. Inserts data outside transaction for visibility.
+   */
+  describe('TC01_US_FindAll_NameFilter', () => {
     it('should return users matching the name filter', async () => {
       // Test Case Metadata
       /**
@@ -228,20 +235,17 @@ describe('UserServiceImpl - findAll (Same DB)', () => {
       // Cleanup: Handled by afterEach
     });
   });
-  // Test Case 2.3.2: Successfully retrieve users with email filter
-  describe('TC-2.3.2: Filter users by email', () => {
+  /**
+   * Test Case: TC02_US_FindAll_EmailFilter
+   * Objective: Verify that findAll returns users matching the provided email filter
+   * Input: UserFilter { name: '', email: 'example.com', sort: [] }
+   * Expected Output: Array of UserDto objects with email containing 'example.com'
+   * Notes: Uses production database with cleanup. Inserts data outside transaction for visibility.
+   */
+  describe('TC02_US_FindAll_EmailFilter', () => {
     it('should return users matching the email filter', async () => {
-      // Test Case Metadata
-      /**
-       * Test Case ID: TC-2.3.2
-       * Objective: Verify that findAll returns users matching the provided email filter
-       * Input: UserFilter { email: 'example.com' }
-       * Expected Output: Array of UserDto objects with email containing 'example.com'
-       * Note: Uses production database with careful cleanup. Inserts data outside transaction for visibility.
-       */
-
       // Arrange: Insert test data outside transaction to ensure visibility
-      const uniqueEmail = `test-john.doe.${Date.now()}@example.com`;
+      const uniqueEmail = `test-john.doe.${Date.now()}@example1.com`;
       await prismaService.user.createMany({
         data: [
           baseUserData(uniqueEmail, 'John', 'Doe'),
@@ -262,7 +266,7 @@ describe('UserServiceImpl - findAll (Same DB)', () => {
         displayName: 'John Doe',
       });
 
-      const filter: UserFilter = { name: '', email: 'example.com', sort: [] };
+      const filter: UserFilter = { name: '', email: 'example1.com', sort: [] };
 
       // Act
       const result = await userService.findAll(filter);
@@ -285,7 +289,7 @@ describe('UserServiceImpl - findAll (Same DB)', () => {
       // Verify database state within transaction for rollback
       await prismaService.$transaction(async (tx) => {
         const dbUsers = await tx.user.findMany({
-          where: { email: { contains: 'example.com' } },
+          where: { email: { contains: 'example1.com' } },
         });
         expect(dbUsers).toHaveLength(1);
         expect(dbUsers[0]).toMatchObject({
@@ -300,18 +304,15 @@ describe('UserServiceImpl - findAll (Same DB)', () => {
     });
   });
 
-  // Test Case 2.3.3: Retrieve users with sorting
-  describe('TC-2.3.3: Filter users with sorting', () => {
+  /**
+   * Test Case: TC03_US_FindAll_Sorted
+   * Objective: Verify that findAll returns users sorted by firstName in ascending order
+   * Input: UserFilter { name: '', email: 'test1-', sort: [{ field: 'firstName', direction: 'asc' }] }
+   * Expected Output: Array of UserDto objects sorted by firstName in ascending order
+   * Notes: Uses production database with cleanup. Inserts data outside transaction for visibility.
+   */
+  describe('TC03_US_FindAll_Sorted', () => {
     it('should return sorted users based on sort parameter', async () => {
-      // Test Case Metadata
-      /**
-       * Test Case ID: TC-2.3.3
-       * Objective: Verify that findAll returns users sorted according to sort parameter
-       * Input: UserFilter { email: 'test-', sort: [{ field: 'firstName', direction: 'asc' }] }
-       * Expected Output: Array of UserDto objects sorted by firstName in ascending order
-       * Note: Tests sorting in production database, uses email filter to limit to test users. Inserts data outside transaction for visibility.
-       */
-
       // Arrange: Insert test data outside transaction to ensure visibility
       await prismaService.user.createMany({
         data: [
@@ -380,18 +381,15 @@ describe('UserServiceImpl - findAll (Same DB)', () => {
     });
   });
 
-  // Test Case 2.3.4: Empty result for no matching users
-  describe('TC-2.3.4: No matching users', () => {
+  /**
+   * Test Case: TC04_US_FindAll_NoMatches
+   * Objective: Verify that findAll returns an empty array when no users match the name filter
+   * Input: UserFilter { name: 'Nonexistent', email: '', sort: [] }
+   * Expected Output: Empty array []
+   * Notes: Uses production database with cleanup. Tests empty results.
+   */
+  describe('TC04_US_FindAll_NoMatches', () => {
     it('should return empty array when no users match the filter', async () => {
-      // Test Case Metadata
-      /**
-       * Test Case ID: TC-2.3.4
-       * Objective: Verify that findAll returns empty array when no users match
-       * Input: UserFilter { name: 'Nonexistent' }
-       * Expected Output: Empty array []
-       * Note: Tests empty results in production database
-       */
-
       await prismaService.$transaction(async (tx) => {
         // Arrange: Insert unrelated data
         const uniqueEmail = `john.doe.${Date.now()}@example.com`;
@@ -570,21 +568,10 @@ describe('UserServiceImpl - getUserById (Same DB)', () => {
     jobType: $Enums.JobType.FULL_TIME, // Assuming FULL_TIME is a valid member of your JobType enum
     minSalary: 50000,
     maxSalary: 100000,
-    // location: 'Remote', // This field is not in your RecruitmentDto. Ensure it exists in your Prisma schema for Recruitment.
-    // status: 'OPEN',     // This field is not in your RecruitmentDto. Ensure it exists in your Prisma schema for Recruitment.
-    // experience: 'MID', // Original value
-    experience: 2, // Changed to number to align with RecruitmentDto's "experience: number".
-    // Adjust '2' if 'MID' maps to a different number or if 'experience' is an enum itself (e.g., $Enums.ExperienceLevel.MID).
-    // If 'experience' in your Prisma schema is actually a string or a specific enum, this needs to match that.
-    // For now, this aligns with the provided RecruitmentDto.
+    experience: 2,
     deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
     createdAt: new Date(),
     updatedAt: new Date(),
-    // Ensure all required fields from your Prisma schema for Recruitment are present.
-    // For example, if 'location' and 'status' are required, they should be included.
-    // Based on RecruitmentDto, these were not listed, but your original baseRecruitmentData had them.
-    // For this example, I'm assuming they might be optional or handled if not provided.
-    // If they are required and not in RecruitmentDto, you might want to update the DTO or ensure they are provided here.
   });
 
   // Common test data setup for Application
@@ -602,8 +589,14 @@ describe('UserServiceImpl - getUserById (Same DB)', () => {
     updatedAt: new Date(),
   });
 
-  // Test Case 1.1: Retrieve existing user with no related data
-  describe('TC-1.1: Retrieve user with no related data', () => {
+  /**
+   * Test Case: TC05_US_GetUserById_NoRelatedData
+   * Objective: Verify that getUserById returns a user with no related company or applications
+   * Input: Valid userId of an existing user
+   * Expected Output: UserDto-like object with no company and empty applications array
+   * Notes: Uses production database with cleanup. Inserts data outside transaction for visibility.
+   */
+  describe('TC05_US_GetUserById_NoRelatedData', () => {
     it('should return user without company or applications', async () => {
       // Test Case Metadata
       /**
@@ -640,18 +633,15 @@ describe('UserServiceImpl - getUserById (Same DB)', () => {
     });
   });
 
-  // Test Case 1.2: Retrieve existing user with related data
-  describe('TC-1.2: Retrieve user with related data', () => {
+  /**
+   * Test Case: TC06_US_GetUserById_WithRelatedData
+   * Objective: Verify that getUserById returns a user with related company and applications
+   * Input: Valid userId of an existing user with company and applications
+   * Expected Output: UserDto-like object with company and applications including recruitment details
+   * Notes: Uses production database with cleanup. Inserts data outside transaction for visibility.
+   */
+  describe('TC06_US_GetUserById_WithRelatedData', () => {
     it('should return user with company and applications', async () => {
-      // Test Case Metadata
-      /**
-       * Test Case ID: TC-1.2
-       * Objective: Verify that getUserById returns a user with related company and applications
-       * Input: userId of an existing user with company and applications
-       * Expected Output: UserDto-like object with company and applications (including recruitment and its company)
-       * Note: Inserts and cleans up test data in the production database. Data inserted outside transaction for visibility.
-       */
-
       // Arrange: Insert test data outside transaction
       const email = `test-jane.smith.${Date.now()}@example.com`;
       const company = await prismaService.company.create({
@@ -724,18 +714,15 @@ describe('UserServiceImpl - getUserById (Same DB)', () => {
     });
   });
 
-  // Test Case 1.3: Throw NotFoundException for non-existent user
-  describe('TC-1.3: Non-existent user', () => {
+  /**
+   * Test Case: TC07_US_GetUserById_NonExistent
+   * Objective: Verify that getUserById throws NotFoundException for a non-existent user ID
+   * Input: Non-existent userId (999999)
+   * Expected Output: NotFoundException with message including userId
+   * Notes: Uses production database, no data insertion needed.
+   */
+  describe('TC07_US_GetUserById_NonExistent', () => {
     it('should throw NotFoundException for non-existent user ID', async () => {
-      // Test Case Metadata
-      /**
-       * Test Case ID: TC-1.3
-       * Objective: Verify that getUserById throws NotFoundException for a non-existent user ID
-       * Input: Non-existent userId (999999)
-       * Expected Output: NotFoundException with message including userId
-       * Note: Uses production database, no data insertion needed
-       */
-
       // Arrange
       const nonExistentId = 999999;
 
@@ -825,16 +812,15 @@ describe('UserServiceImpl - getUserByEmail (Integration Tests with Real DB)', ()
     avatar: null,
   });
 
-  // Test Case 1: User exists
-  describe('TC-1: User exists', () => {
+  /**
+   * Test Case: TC8_US_GetUserByEmail_Existing
+   * Objective: Verify that getUserByEmail returns a UserDto for an existing user
+   * Input: Valid email of an existing user
+   * Expected Output: UserDto with correct fields, no company or applications
+   * Notes: Uses production database with cleanup. Tests path where user is found.
+   */
+  describe('TC8_US_GetUserByEmail_Existing', () => {
     it('should return UserDto when user is found', async () => {
-      /**
-       * Test Case ID: TC-1
-       * Objective: Verify that getUserByEmail returns a UserDto for an existing user
-       * Input: Email of an existing user
-       * Expected Output: UserDto with correct fields, no company or applications
-       * White-Box: Tests the path where prisma.user.findUnique returns a user
-       */
       const email = `test-john.doe.${Date.now()}@example.com`;
       const user = await prismaService.user.create({
         data: baseUserData(email, 'John', 'Doe'),
@@ -857,16 +843,15 @@ describe('UserServiceImpl - getUserByEmail (Integration Tests with Real DB)', ()
     });
   });
 
-  // Test Case 2: Non-existent email
-  describe('TC-2: Non-existent email', () => {
+  /**
+   * Test Case: TC09_US_GetUserByEmail_NonExistent
+   * Objective: Verify that getUserByEmail throws NotFoundException for a non-existent email
+   * Input: Non-existent email
+   * Expected Output: NotFoundException with message including email
+   * Notes: Uses production database, no data insertion needed.
+   */
+  describe('TC09_US_GetUserByEmail_NonExistent', () => {
     it('should throw NotFoundException for non-existent email', async () => {
-      /**
-       * Test Case ID: TC-2
-       * Objective: Verify that getUserByEmail throws NotFoundException for a non-existent email
-       * Input: Non-existent email
-       * Expected Output: NotFoundException with Message.USER_NOT_FOUND(email)
-       * White-Box: Tests the path where prisma.user.findUnique returns null
-       */
       const nonExistentEmail = 'nonexistent@example.com';
 
       await expect(
@@ -877,16 +862,15 @@ describe('UserServiceImpl - getUserByEmail (Integration Tests with Real DB)', ()
     });
   });
 
-  // Test Case 3: Empty email string
-  describe('TC-3: Empty email string', () => {
+  /**
+   * Test Case: TC10_US_GetUserByEmail_EmptyEmail
+   * Objective: Verify that getUserByEmail throws NotFoundException for an empty email string
+   * Input: Empty email string
+   * Expected Output: NotFoundException with message for empty email
+   * Notes: Uses production database, tests invalid input handling.
+   */
+  describe('TC10_US_GetUserByEmail_EmptyEmail', () => {
     it('should throw NotFoundException for empty email', async () => {
-      /**
-       * Test Case ID: TC-3
-       * Objective: Verify that getUserByEmail handles an empty email string
-       * Input: Empty email string
-       * Expected Output: NotFoundException with Message.USER_NOT_FOUND('')
-       * White-Box: Tests the path where prisma.user.findUnique returns null for invalid input
-       */
       const emptyEmail = '';
 
       await expect(userService.getUserByEmail(emptyEmail)).rejects.toThrow(
@@ -975,16 +959,15 @@ describe('UserServiceImpl - createUser (Integration Tests with Real DB)', () => 
     avatar: null,
   });
 
-  // Test Case 1: Create user successfully
-  describe('TC-1: Create user successfully', () => {
+  /**
+   * Test Case: TC11_US_CreateUser_Success
+   * Objective: Verify that createUser creates a user when no existing user is found
+   * Input: Valid UserCreateInput with email, firstName, lastName, password
+   * Expected Output: UserDto with hashed password and role 'USER'
+   * Notes: Uses production database with cleanup. Tests successful user creation path.
+   */
+  describe('TC11_US_CreateUser_Success', () => {
     it('should create and return UserDto when user does not exist', async () => {
-      /**
-       * Test Case ID: TC-1
-       * Objective: Verify that createUser creates a user when no existing user is found
-       * Input: Valid UserCreateInput
-       * Expected Output: UserDto with hashed password and role 'USER'
-       * White-Box: Tests path where checkUserExists returns null and user is created
-       */
       const inputData = baseUserData(
         `test-john.doe.${Date.now()}@example.com`,
         'John',
@@ -1008,16 +991,15 @@ describe('UserServiceImpl - createUser (Integration Tests with Real DB)', () => 
     });
   });
 
-  // Test Case 2: Existing user
-  describe('TC-2: Existing user', () => {
+  /**
+   * Test Case: TC12_US_CreateUser_ExistingEmail
+   * Objective: Verify that createUser throws BadRequestException for an existing email
+   * Input: UserCreateInput with an existing email
+   * Expected Output: BadRequestException with message indicating user already exists
+   * Notes: Uses production database with cleanup. Tests duplicate email handling.
+   */
+  describe(' TC12_US_CreateUser_ExistingEmail', () => {
     it('should throw BadRequestException when user already exists', async () => {
-      /**
-       * Test Case ID: TC-2
-       * Objective: Verify that createUser throws BadRequestException for an existing email
-       * Input: UserCreateInput with existing email
-       * Expected Output: BadRequestException with Message.USER_ALREADY_EXISTS
-       * White-Box: Tests path where checkUserExists returns a user
-       */
       const email = `test-jane.smith.${Date.now()}@example.com`;
       const inputData = baseUserData(email, 'Jane', 'Smith');
       await prismaService.user.create({ data: inputData });
@@ -1028,16 +1010,15 @@ describe('UserServiceImpl - createUser (Integration Tests with Real DB)', () => 
     });
   });
 
-  // Test Case 3: Empty email
-  describe('TC-3: Empty email', () => {
+  /**
+   * Test Case: TC13_US_CreateUser_EmptyEmail
+   * Objective: Verify that createUser throws an error for an empty email
+   * Input: UserCreateInput with empty email
+   * Expected Output: PrismaClientValidationError due to schema constraints
+   * Notes: Uses production database. Tests invalid input validation.
+   */
+  describe('TC13_US_CreateUser_EmptyEmail', () => {
     it('should throw Prisma error for empty email', async () => {
-      /**
-       * Test Case ID: TC-3
-       * Objective: Verify that createUser handles an empty email
-       * Input: UserCreateInput with empty email
-       * Expected Output: PrismaClientValidationError due to schema constraints
-       * White-Box: Tests behavior with invalid input violating schema
-       */
       const inputData = baseUserData('', 'John', 'Doe');
 
       await expect(userService.createUser(inputData)).rejects.toThrow(
@@ -1048,16 +1029,15 @@ describe('UserServiceImpl - createUser (Integration Tests with Real DB)', () => 
     });
   });
 
-  // Test Case 4: Empty password
-  describe('TC-4: Empty password', () => {
+  /**
+   * Test Case: TC14_US_CreateUser_EmptyPassword
+   * Objective: Verify that createUser throws an error for an empty password
+   * Input: UserCreateInput with empty password
+   * Expected Output: PrismaClientValidationError due to schema constraints
+   * Notes: Uses production database. Tests invalid input validation.
+   */
+  describe('TC14_US_CreateUser_EmptyPassword', () => {
     it('should throw Prisma error for empty password', async () => {
-      /**
-       * Test Case ID: TC-4
-       * Objective: Verify that createUser handles an empty password
-       * Input: UserCreateInput with empty password
-       * Expected Output: PrismaClientValidationError due to schema constraints
-       * White-Box: Tests behavior with invalid input violating schema
-       */
       const inputData = baseUserData(
         `test-bob.${Date.now()}@example.com`,
         'Bob',
@@ -1152,16 +1132,15 @@ describe('UserServiceImpl - createCompanyAdminAccount (Integration Tests with Re
     avatar: null,
   });
 
-  // Test Case 1: Create company admin successfully
-  describe('TC-1: Create company admin successfully', () => {
+  /**
+   * Test Case: TC15_US_CreateCompanyAdmin_Success
+   * Objective: Verify that createCompanyAdminAccount creates a user with COMPANY_ADMIN role
+   * Input: Valid UserCreateInput with email, firstName, lastName, password
+   * Expected Output: UserDto with hashed password and role 'COMPANY_ADMIN'
+   * Notes: Uses production database with cleanup. Tests successful admin creation path.
+   */
+  describe('TC15_US_CreateCompanyAdmin_Success', () => {
     it('should create and return UserDto with COMPANY_ADMIN role when user does not exist', async () => {
-      /**
-       * Test Case ID: TC-1
-       * Objective: Verify that createCompanyAdminAccount creates a user with COMPANY_ADMIN role
-       * Input: Valid UserCreateInput
-       * Expected Output: UserDto with hashed password and role 'COMPANY_ADMIN'
-       * White-Box: Tests path where checkUserExists returns null and user is created
-       */
       const inputData = baseUserData(
         `test-john.doe.${Date.now()}@example.com`,
         'John',
@@ -1186,16 +1165,15 @@ describe('UserServiceImpl - createCompanyAdminAccount (Integration Tests with Re
     });
   });
 
-  // Test Case 2: Existing user
-  describe('TC-2: Existing user', () => {
+  /**
+   * Test Case: TC16_US_CreateCompanyAdmin_ExistingEmail
+   * Objective: Verify that createCompanyAdminAccount throws BadRequestException for an existing email
+   * Input: UserCreateInput with an existing email
+   * Expected Output: BadRequestException with message indicating user already exists
+   * Notes: Uses production database with cleanup. Tests duplicate email handling.
+   */
+  describe('TC16_US_CreateCompanyAdmin_ExistingEmail', () => {
     it('should throw BadRequestException when user already exists', async () => {
-      /**
-       * Test Case ID: TC-2
-       * Objective: Verify that createCompanyAdminAccount throws BadRequestException for existing email
-       * Input: UserCreateInput with existing email
-       * Expected Output: BadRequestException with Message.USER_ALREADY_EXISTS
-       * White-Box: Tests path where checkUserExists returns a user
-       */
       const email = `test-jane.smith.${Date.now()}@example.com`;
       const inputData = baseUserData(email, 'Jane', 'Smith');
       await prismaService.user.create({
@@ -1210,16 +1188,16 @@ describe('UserServiceImpl - createCompanyAdminAccount (Integration Tests with Re
     });
   });
 
-  // Test Case 3: Empty email
-  describe('TC-3: Empty email', () => {
+  /**
+   * Test Case: TC17_US_CreateCompanyAdmin_EmptyEmail
+   * Objective: Verify that createCompanyAdminAccount throws an error for an empty email
+   * Input: UserCreateInput with empty email
+   * Expected Output: PrismaClientValidationError due to schema constraints
+   * Notes: Uses production database. Tests invalid input validation.
+   */
+
+  describe('TC17_US_CreateCompanyAdmin_EmptyEmail', () => {
     it('should throw Prisma error for empty email', async () => {
-      /**
-       * Test Case ID: TC-3
-       * Objective: Verify that createCompanyAdminAccount handles an empty email
-       * Input: UserCreateInput with empty email
-       * Expected Output: PrismaClientValidationError due to schema constraints
-       * White-Box: Tests behavior with invalid input violating schema
-       */
       const inputData = baseUserData('', 'John', 'Doe');
 
       await expect(
@@ -1232,16 +1210,15 @@ describe('UserServiceImpl - createCompanyAdminAccount (Integration Tests with Re
     });
   });
 
-  // Test Case 4: Empty password
-  describe('TC-4: Empty password', () => {
+  /**
+   * Test Case: TC18_US_CreateCompanyAdmin_EmptyPassword
+   * Objective: Verify that createCompanyAdminAccount throws an error for an empty password
+   * Input: UserCreateInput with empty password
+   * Expected Output: PrismaClientValidationError due to schema constraints
+   * Notes: Uses production database. Tests invalid input validation.
+   */
+  describe('TC18_US_CreateCompanyAdmin_EmptyPassword', () => {
     it('should throw Prisma error for empty password', async () => {
-      /**
-       * Test Case ID: TC-4
-       * Objective: Verify that createCompanyAdminAccount handles an empty password
-       * Input: UserCreateInput with empty password
-       * Expected Output: PrismaClientValidationError due to schema constraints
-       * White-Box: Tests behavior with invalid input violating schema
-       */
       const inputData = baseUserData(
         `test-bob.${Date.now()}@example.com`,
         'Bob',
@@ -1259,13 +1236,6 @@ describe('UserServiceImpl - createCompanyAdminAccount (Integration Tests with Re
     });
   });
 });
-
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { PrismaService } from '../prisma/prisma.service';
-// import { UserServiceImpl } from './user.service';
-// import { INestApplication, BadRequestException } from '@nestjs/common';
-// import { Role } from '@prisma/client';
-// import { Message } from '../../constants/message';
 
 // Note: Using the production database, so we must ensure cleanup of test users
 describe('UserServiceImpl - changePassword (Integration Tests with Real DB)', () => {
@@ -1347,16 +1317,15 @@ describe('UserServiceImpl - changePassword (Integration Tests with Real DB)', ()
     companyId: null,
   });
 
-  // Test Case 1: Successfully change password
-  describe('TC-1: Successfully change password', () => {
+  /**
+   * Test Case: TC19_US_ChangePassword_Success
+   * Objective: Verify that changePassword updates the password for a valid user with correct current password
+   * Input: Valid ChangePasswordDto with currentPassword, newPassword, and authenticated user
+   * Expected Output: Resolves (void), password updated in database
+   * Notes: Uses production database with cleanup. Tests successful password change path.
+   */
+  describe('TC19_US_ChangePassword_Success', () => {
     it('should change password when user exists and current password is correct', async () => {
-      /**
-       * Test Case ID: TC-1
-       * Objective: Verify that changePassword updates the password for a valid user with correct current password
-       * Input: Valid ChangePasswordDto and user
-       * Expected Output: Resolves (void), password updated in database
-       * White-Box: Tests path where user exists and bcrypt.compareSync returns true
-       */
       // Arrange
       const email = `test-john.doe.${Date.now()}@example.com`;
       const currentPassword = 'current-password';
@@ -1406,16 +1375,15 @@ describe('UserServiceImpl - changePassword (Integration Tests with Real DB)', ()
     });
   });
 
-  // Test Case 2: Non-existent user
-  describe('TC-2: Non-existent user', () => {
+  /**
+   * Test Case: TC20_US_ChangePassword_NonExistent
+   * Objective: Verify that changePassword throws BadRequestException for a non-existent user
+   * Input: Valid ChangePasswordDto and non-existent user
+   * Expected Output: BadRequestException with message indicating wrong current password
+   * Notes: Uses production database. Tests non-existent user handling.
+   */
+  describe('TC20_US_ChangePassword_NonExistent', () => {
     it('should throw BadRequestException when user does not exist', async () => {
-      /**
-       * Test Case ID: TC-2
-       * Objective: Verify that changePassword throws BadRequestException for non-existent user
-       * Input: Valid ChangePasswordDto and non-existent user
-       * Expected Output: BadRequestException with Message.WRONG_CURRENT_PASSWORD
-       * White-Box: Tests path where user is null
-       */
       // Arrange
       const changePasswordDto = {
         currentPassword: 'current-password',
@@ -1444,16 +1412,15 @@ describe('UserServiceImpl - changePassword (Integration Tests with Real DB)', ()
     });
   });
 
-  // Test Case 3: Incorrect current password
-  describe('TC-3: Incorrect current password', () => {
+  /**
+   * Test Case: TC21_US_ChangePassword_IncorrectCurrent
+   * Objective: Verify that changePassword throws BadRequestException for an incorrect current password
+   * Input: Valid ChangePasswordDto with incorrect currentPassword
+   * Expected Output: BadRequestException with message indicating wrong current password
+   * Notes: Uses production database with cleanup. Tests incorrect password validation.
+   */
+  describe('TC21_US_ChangePassword_IncorrectCurrent', () => {
     it('should throw BadRequestException when current password is incorrect', async () => {
-      /**
-       * Test Case ID: TC-3
-       * Objective: Verify that changePassword throws BadRequestException for incorrect current password
-       * Input: Valid ChangePasswordDto with incorrect currentPassword
-       * Expected Output: BadRequestException with Message.WRONG_CURRENT_PASSWORD
-       * White-Box: Tests path where bcrypt.compareSync returns false
-       */
       // Arrange
       const email = `test-jane.smith.${Date.now()}@example.com`;
       const currentPassword = 'current-password';
@@ -1492,16 +1459,15 @@ describe('UserServiceImpl - changePassword (Integration Tests with Real DB)', ()
     });
   });
 
-  // Test Case 4: Empty current password
-  describe('TC-4: Empty current password', () => {
+  /**
+   * Test Case: TC22_US_ChangePassword_EmptyCurrent
+   * Objective: Verify that changePassword throws BadRequestException for an empty current password
+   * Input: ChangePasswordDto with empty currentPassword
+   * Expected Output: BadRequestException with message indicating wrong current password
+   * Notes: Uses production database with cleanup. Tests empty current password handling.
+   */
+  describe('TC22_US_ChangePassword_EmptyCurrent', () => {
     it('should throw BadRequestException for empty current password', async () => {
-      /**
-       * Test Case ID: TC-4
-       * Objective: Verify that changePassword handles an empty current password
-       * Input: ChangePasswordDto with empty currentPassword
-       * Expected Output: BadRequestException with Message.WRONG_CURRENT_PASSWORD
-       * White-Box: Tests bcrypt.compareSync with empty input
-       */
       // Arrange
       const email = `test-bob.${Date.now()}@example.com`;
       const currentPassword = 'current-password';
@@ -1540,16 +1506,15 @@ describe('UserServiceImpl - changePassword (Integration Tests with Real DB)', ()
     });
   });
 
-  // Test Case 5: Empty new password
-  describe('TC-5: Empty new password', () => {
+  /**
+   * Test Case: TC23_US_ChangePassword_EmptyNew
+   * Objective: Verify that changePassword throws an error for an empty new password
+   * Input: ChangePasswordDto with empty newPassword
+   * Expected Output: Error due to bcrypt.hash failure
+   * Notes: Uses production database with cleanup. Tests empty new password handling.
+   */
+  describe('TC23_US_ChangePassword_EmptyNew', () => {
     it('should throw error for empty new password', async () => {
-      /**
-       * Test Case ID: TC-5
-       * Objective: Verify that changePassword handles an empty new password
-       * Input: ChangePasswordDto with empty newPassword
-       * Expected Output: Error due to bcrypt.hash failure
-       * White-Box: Tests bcrypt.hash with empty input
-       */
       // Arrange
       const email = `test-alice.${Date.now()}@example.com`;
       const currentPassword = 'current-password';

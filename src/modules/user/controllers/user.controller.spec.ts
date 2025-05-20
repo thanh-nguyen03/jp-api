@@ -82,8 +82,13 @@ describe('UserController - PUT /users/change-password (Integration)', () => {
     await app.close();
   });
 
-  // TC1: Valid user and valid ChangePasswordDto - Success
-  it('TC1: should return success response for valid user and DTO', async () => {
+  /**
+   * Test Case: TC01_UC_ChangePassword_Success
+   * Objective: Verify successful password change with valid user and input
+   * Input: Valid x-current-user header, valid ChangePasswordDto
+   * Expected Output: 200 OK, changePassword() called with correct args
+   */
+  it('TC01_UC_ChangePassword_Success', async () => {
     userService.changePassword.mockResolvedValue(undefined);
 
     const response = await request(app.getHttpServer())
@@ -99,8 +104,13 @@ describe('UserController - PUT /users/change-password (Integration)', () => {
     expect(response.body).toEqual(ResponseDto.successDefault(undefined));
   });
 
-  // TC2: Null user - Unauthorized (401)
-  it('TC2: should return 401 for null user', async () => {
+  /**
+   * Test Case: TC02_UC_ChangePassword_Unauthorized
+   * Objective: Ensure unauthorized access is blocked if no user in request
+   * Input: No x-current-user header
+   * Expected Output: 401 Unauthorized, service not called
+   */
+  it('TC02_UC_ChangePassword_Unauthorized', async () => {
     await request(app.getHttpServer())
       .put('/users/change-password')
       .send(mockChangePasswordDto)
@@ -109,8 +119,13 @@ describe('UserController - PUT /users/change-password (Integration)', () => {
     expect(userService.changePassword).not.toHaveBeenCalled();
   });
 
-  // TC3: Service throws error - Propagates error
-  it('TC3: should return 400 for invalid current password', async () => {
+  /**
+   * Test Case: TC03_UC_ChangePassword_BadRequest
+   * Objective: Propagate error if service throws BadRequestException
+   * Input: Valid user, valid DTO, service throws BadRequestException
+   * Expected Output: 400 Bad Request, proper error response
+   */
+  it('Test Case: TC03_UC_ChangePassword_BadRequest', async () => {
     const error = new BadRequestException('Invalid current password');
     userService.changePassword.mockRejectedValue(error);
 
@@ -126,8 +141,13 @@ describe('UserController - PUT /users/change-password (Integration)', () => {
     );
   });
 
-  // TC4: Invalid ChangePasswordDto - Validation error (400)
-  it('TC4: should return 400 for invalid DTO', async () => {
+  /**
+   * Test Case: TC04_UC_ChangePassword_InvalidDTO
+   * Objective: Validate input fields and block bad DTO data
+   * Input: Empty currentPassword, short newPassword
+   * Expected Output: 400 Bad Request, validation failure
+   */
+  it('TC04_UC_ChangePassword_InvalidDTO', async () => {
     const invalidDto = {
       currentPassword: '', // Violates @IsNotEmpty
       newPassword: '123', // Violates @MinLength(6)
