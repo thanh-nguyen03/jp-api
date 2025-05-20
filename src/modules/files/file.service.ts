@@ -9,7 +9,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuid } from 'uuid';
-import { Message } from 'src/constants/message';
+import { Message } from '../../constants/message';
 
 export abstract class FileService {
   abstract upload(file: Express.Multer.File, user: User): Promise<string>;
