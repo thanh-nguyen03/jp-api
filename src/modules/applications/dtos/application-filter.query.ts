@@ -19,7 +19,7 @@ export class ApplicationFilter extends PartialType(BaseFilter) {
   @IsOptional()
   @IsString()
   @IsIn([...Object.values($Enums.ApplicationStatus), ''])
-  status: $Enums.ApplicationStatus;
+  status?: $Enums.ApplicationStatus;
 
   @AcceptedSortField('id')
   sort?: BaseFilter['sort'];
