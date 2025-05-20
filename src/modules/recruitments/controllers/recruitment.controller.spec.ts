@@ -185,7 +185,7 @@ describe('RecruitmentController - GET /recruitments', () => {
   });
 
   /**
-   * TC-RC-012: Edge: Empty filter values
+   * TC-RC-005: Edge: Empty filter values
    * - Goal: Should return 200 OK with empty data for empty filter values
    * - Input:
    *   - filter: all fields empty or undefined
@@ -194,7 +194,7 @@ describe('RecruitmentController - GET /recruitments', () => {
    *   - ResponseDto.successDefault with empty data
    * - Notes: None
    */
-  it('TC-RC-012: Edge: Empty filter values', async () => {
+  it('TC-RC-005: Edge: Empty filter values', async () => {
     recruitmentService.findAll.mockResolvedValue({ data: [], total: 0, offset: 0, limit: 10 });
     const filter: RecruitmentFilter = { title: '', jobType: undefined, companyId: undefined, minSalary: undefined, maxSalary: undefined, experience: undefined, limit: 10, offset: 0, sort: [] };
     const response = await request(app.getHttpServer())
@@ -202,7 +202,7 @@ describe('RecruitmentController - GET /recruitments', () => {
       .set('x-current-user', JSON.stringify(mockUser))
       .query(filter)
       .expect(200);
-    console.log('[TEST]', 'TC-RC-012: Edge - Empty filter values');
+    console.log('[TEST]', 'TC-RC-005: Edge - Empty filter values');
     console.log('Input:', { filter, user: mockUser });
     console.log('Expected Output:', ResponseDto.successDefault({ data: [], total: 0, offset: 0, limit: 10 }));
     console.log('Actual Output:', response.body);
@@ -211,7 +211,7 @@ describe('RecruitmentController - GET /recruitments', () => {
   });
 
   /**
-   * TC-RC-013: Edge: Whitespace filter values
+   * TC-RC-006: Edge: Whitespace filter values
    * - Goal: Should return 200 OK with empty data for whitespace filter values
    * - Input:
    *   - filter: title is whitespace
@@ -220,7 +220,7 @@ describe('RecruitmentController - GET /recruitments', () => {
    *   - ResponseDto.successDefault with empty data
    * - Notes: None
    */
-  it('TC-RC-013: Edge: Whitespace filter values', async () => {
+  it('TC-RC-006: Edge: Whitespace filter values', async () => {
     recruitmentService.findAll.mockResolvedValue({ data: [], total: 0, offset: 0, limit: 10 });
     const filter: RecruitmentFilter = { title: '   ', jobType: undefined, companyId: undefined, minSalary: undefined, maxSalary: undefined, experience: undefined, limit: 10, offset: 0, sort: [] };
     const response = await request(app.getHttpServer())
@@ -228,7 +228,7 @@ describe('RecruitmentController - GET /recruitments', () => {
       .set('x-current-user', JSON.stringify(mockUser))
       .query(filter)
       .expect(200);
-    console.log('[TEST]', 'TC-RC-013: Edge - Whitespace filter values');
+    console.log('[TEST]', 'TC-RC-006: Edge - Whitespace filter values');
     console.log('Input:', { filter, user: mockUser });
     console.log('Expected Output:', ResponseDto.successDefault({ data: [], total: 0, offset: 0, limit: 10 }));
     console.log('Actual Output:', response.body);
@@ -237,7 +237,7 @@ describe('RecruitmentController - GET /recruitments', () => {
   });
 
   /**
-   * TC-RC-014: Edge: Very large limit/offset
+   * TC-RC-007: Edge: Very large limit/offset
    * - Goal: Should return 200 OK with empty data for very large limit/offset
    * - Input:
    *   - filter: limit and offset are very large numbers
@@ -246,7 +246,7 @@ describe('RecruitmentController - GET /recruitments', () => {
    *   - ResponseDto.successDefault with empty data
    * - Notes: None
    */
-  it('TC-RC-014: Edge: Very large limit/offset', async () => {
+  it('TC-RC-007: Edge: Very large limit/offset', async () => {
     recruitmentService.findAll.mockResolvedValue({ data: [], total: 0, offset: 1e6, limit: 1e6 });
     const filter: RecruitmentFilter = { title: '', jobType: undefined, companyId: 1, minSalary: 0, maxSalary: 0, experience: 0, limit: 1e6, offset: 1e6, sort: [] };
     const response = await request(app.getHttpServer())
@@ -254,7 +254,7 @@ describe('RecruitmentController - GET /recruitments', () => {
       .set('x-current-user', JSON.stringify(mockUser))
       .query(filter)
       .expect(200);
-    console.log('[TEST]', 'TC-RC-014: Edge - Very large limit/offset');
+    console.log('[TEST]', 'TC-RC-007: Edge - Very large limit/offset');
     console.log('Input:', { filter, user: mockUser });
     console.log('Expected Output:', ResponseDto.successDefault({ data: [], total: 0, offset: 1e6, limit: 1e6 }));
     console.log('Actual Output:', response.body);
@@ -263,7 +263,7 @@ describe('RecruitmentController - GET /recruitments', () => {
   });
 
   /**
-   * TC-RC-015: Edge: Negative limit/offset
+   * TC-RC-008: Edge: Negative limit/offset
    * - Goal: Should return 400 Bad Request for negative limit/offset
    * - Input:
    *   - filter: limit and offset are negative numbers
@@ -271,21 +271,21 @@ describe('RecruitmentController - GET /recruitments', () => {
    *   - 400 Bad Request
    * - Notes: None
    */
-  it('TC-RC-015: Edge: Negative limit/offset', async () => {
+  it('TC-RC-008: Edge: Negative limit/offset', async () => {
     const filter: RecruitmentFilter = { title: '', jobType: undefined, companyId: 1, minSalary: 0, maxSalary: 0, experience: 0, limit: -10, offset: -5, sort: [] };
     const response = await request(app.getHttpServer())
       .get('/recruitments')
       .set('x-current-user', JSON.stringify(mockUser))
       .query(filter)
       .expect(400);
-    console.log('[TEST]', 'TC-RC-015: Edge - Negative limit/offset');
+    console.log('[TEST]', 'TC-RC-008: Edge - Negative limit/offset');
     console.log('Input:', { filter, user: mockUser });
     console.log('Expected Output:', '400 Bad Request');
     console.log('Actual Output:', response.body);
   });
 
   /**
-   * TC-RC-016: Edge: Special/unicode characters in filter
+   * TC-RC-009: Edge: Special/unicode characters in filter
    * - Goal: Should return 200 OK with empty data for special/unicode characters in filter
    * - Input:
    *   - filter: title contains special/unicode characters
@@ -294,7 +294,7 @@ describe('RecruitmentController - GET /recruitments', () => {
    *   - ResponseDto.successDefault with empty data
    * - Notes: None
    */
-  it('TC-RC-016: Edge: Special/unicode characters in filter', async () => {
+  it('TC-RC-009: Edge: Special/unicode characters in filter', async () => {
     recruitmentService.findAll.mockResolvedValue({ data: [], total: 0, offset: 0, limit: 10 });
     const filter: RecruitmentFilter = { title: '公司-测试-🚀', jobType: undefined, companyId: 1, minSalary: 0, maxSalary: 0, experience: 0, limit: 10, offset: 0, sort: [] };
     const response = await request(app.getHttpServer())
@@ -302,7 +302,7 @@ describe('RecruitmentController - GET /recruitments', () => {
       .set('x-current-user', JSON.stringify(mockUser))
       .query(filter)
       .expect(200);
-    console.log('[TEST]', 'TC-RC-016: Edge - Special/unicode characters in filter');
+    console.log('[TEST]', 'TC-RC-009: Edge - Special/unicode characters in filter');
     console.log('Input:', { filter, user: mockUser });
     console.log('Expected Output:', ResponseDto.successDefault({ data: [], total: 0, offset: 0, limit: 10 }));
     console.log('Actual Output:', response.body);
@@ -311,7 +311,7 @@ describe('RecruitmentController - GET /recruitments', () => {
   });
 
   /**
-   * TC-RC-017: Edge: minSalary > maxSalary
+   * TC-RC-010: Edge: minSalary > maxSalary
    * - Goal: Should return 200 OK with empty data when minSalary > maxSalary
    * - Input:
    *   - filter: minSalary > maxSalary
@@ -320,7 +320,7 @@ describe('RecruitmentController - GET /recruitments', () => {
    *   - ResponseDto.successDefault with empty data
    * - Notes: None
    */
-  it('TC-RC-017: Edge: minSalary > maxSalary', async () => {
+  it('TC-RC-010: Edge: minSalary > maxSalary', async () => {
     recruitmentService.findAll.mockResolvedValue({ data: [], total: 0, offset: 0, limit: 10 });
     const filter: RecruitmentFilter = { title: '', jobType: undefined, companyId: 1, minSalary: 2000, maxSalary: 1000, experience: 0, limit: 10, offset: 0, sort: [] };
     const response = await request(app.getHttpServer())
@@ -328,7 +328,7 @@ describe('RecruitmentController - GET /recruitments', () => {
       .set('x-current-user', JSON.stringify(mockUser))
       .query(filter)
       .expect(200);
-    console.log('[TEST]', 'TC-RC-017: Edge - minSalary > maxSalary');
+    console.log('[TEST]', 'TC-RC-010: Edge - minSalary > maxSalary');
     console.log('Input:', { filter, user: mockUser });
     console.log('Expected Output:', ResponseDto.successDefault({ data: [], total: 0, offset: 0, limit: 10 }));
     console.log('Actual Output:', response.body);
@@ -337,7 +337,7 @@ describe('RecruitmentController - GET /recruitments', () => {
   });
 
   /**
-   * TC-RC-018: Edge: Invalid jobType
+   * TC-RC-011: Edge: Invalid jobType
    * - Goal: Should return 400 Bad Request for invalid jobType
    * - Input:
    *   - filter: jobType is invalid
@@ -345,21 +345,21 @@ describe('RecruitmentController - GET /recruitments', () => {
    *   - 400 Bad Request
    * - Notes: None
    */
-  it('TC-RC-018: Edge: Invalid jobType', async () => {
+  it('TC-RC-011: Edge: Invalid jobType', async () => {
     const filter: RecruitmentFilter = { title: '', jobType: 'INVALID_JOBTYPE' as any, companyId: 1, minSalary: 0, maxSalary: 0, experience: 0, limit: 10, offset: 0, sort: [] };
     const response = await request(app.getHttpServer())
       .get('/recruitments')
       .set('x-current-user', JSON.stringify(mockUser))
       .query(filter)
       .expect(400);
-    console.log('[TEST]', 'TC-RC-018: Edge - Invalid jobType');
+    console.log('[TEST]', 'TC-RC-011: Edge - Invalid jobType');
     console.log('Input:', { filter, user: mockUser });
     console.log('Expected Output:', '400 Bad Request');
     console.log('Actual Output:', response.body);
   });
 
   /**
-   * TC-RC-019: Edge: Missing required fields (companyId)
+   * TC-RC-012: Edge: Missing required fields (companyId)
    * - Goal: Should return 200 OK with empty data when companyId is missing
    * - Input:
    *   - filter: companyId missing
@@ -368,7 +368,7 @@ describe('RecruitmentController - GET /recruitments', () => {
    *   - ResponseDto.successDefault with empty data
    * - Notes: None
    */
-  it('TC-RC-019: Edge: Missing required fields (companyId)', async () => {
+  it('TC-RC-012: Edge: Missing required fields (companyId)', async () => {
     recruitmentService.findAll.mockResolvedValue({ data: [], total: 0, offset: 0, limit: 10 });
     const filter: RecruitmentFilter = { title: '', jobType: undefined, minSalary: 0, maxSalary: 0, experience: 0, limit: 10, offset: 0, sort: [] } as any;
     const response = await request(app.getHttpServer())
@@ -376,7 +376,7 @@ describe('RecruitmentController - GET /recruitments', () => {
       .set('x-current-user', JSON.stringify(mockUser))
       .query(filter)
       .expect(200);
-    console.log('[TEST]', 'TC-RC-019: Edge - Missing required fields (companyId)');
+    console.log('[TEST]', 'TC-RC-012: Edge - Missing required fields (companyId)');
     console.log('Input:', { filter, user: mockUser });
     console.log('Expected Output:', ResponseDto.successDefault({ data: [], total: 0, offset: 0, limit: 10 }));
     console.log('Actual Output:', response.body);
@@ -435,19 +435,19 @@ describe('RecruitmentController - GET /recruitments/:id', () => {
   });
 
   /**
-   * TC-RC-020: Success - Returns recruitment by ID
+   * TC-RC-013: Success - Returns recruitment by ID
    * - Goal: Should return recruitment for valid ID
    * - Input:
    *   Valid recruitment ID
    * - Expected Output:
    *   - 200 OK, ResponseDto.successDefault with recruitment
    */
-  it('TC-RC-020: Success - Returns recruitment by ID', async () => {
+  it('TC-RC-013: Success - Returns recruitment by ID', async () => {
     recruitmentService.findById.mockResolvedValue(mockRecruitment);
     const response = await request(app.getHttpServer())
       .get('/recruitments/1')
       .expect(200);
-    console.log('[TEST]', 'TC-RC-020: Success - Returns recruitment by ID');
+    console.log('[TEST]', 'TC-RC-013: Success - Returns recruitment by ID');
     console.log('Input:', { id: 1 });
     console.log('Expected Output:', ResponseDto.successDefault(mockRecruitment));
     console.log('Actual Output:', response.body);
@@ -457,37 +457,37 @@ describe('RecruitmentController - GET /recruitments/:id', () => {
   });
 
   /**
-   * TC-RC-021: Not Found - Service throws NotFoundException
+   * TC-RC-014: Not Found - Service throws NotFoundException
    * - Goal: Should propagate NotFoundException from service
    * - Input:
    *   Non-existent recruitment ID
    * - Expected Output:
    *   - 404 Not Found
    */
-  it('TC-RC-021: Not Found - Service throws NotFoundException', async () => {
+  it('TC-RC-014: Not Found - Service throws NotFoundException', async () => {
     recruitmentService.findById.mockRejectedValue(new NotFoundException('Not found'));
     const response = await request(app.getHttpServer())
       .get('/recruitments/999')
       .expect(404);
-    console.log('[TEST]', 'TC-RC-021: Not Found - Service throws NotFoundException');
+    console.log('[TEST]', 'TC-RC-014: Not Found - Service throws NotFoundException');
     console.log('Input:', { id: 999 });
     console.log('Expected Output:', '404 Not Found');
     console.log('Actual Output:', response.body);
   });
 
   /**
-   * TC-RC-022: Invalid Input - Non-numeric ID
+   * TC-RC-015: Invalid Input - Non-numeric ID
    * - Goal: Should return 400 for non-numeric ID
    * - Input:
    *   Non-numeric ID
    * - Expected Output:
    *   - 400 Bad Request
    */
-  it('TC-RC-022: Invalid Input - Non-numeric ID', async () => {
+  it('TC-RC-015: Invalid Input - Non-numeric ID', async () => {
     const response = await request(app.getHttpServer())
       .get('/recruitments/not-a-number')
       .expect(400);
-    console.log('[TEST]', 'TC-RC-022: Invalid Input - Non-numeric ID');
+    console.log('[TEST]', 'TC-RC-015: Invalid Input - Non-numeric ID');
     console.log('Input:', { id: 'not-a-number' });
     console.log('Expected Output:', '400 Bad Request');
     console.log('Actual Output:', response.body);
@@ -566,20 +566,20 @@ describe('RecruitmentController - GET /recruitments/:recruitmentId/user-applicat
   });
 
   /**
-   * TC-RC-008: Success - Returns application for recruitment and user
+   * TC-RC-016: Success - Returns application for recruitment and user
    * - Goal: Should return application for valid recruitmentId and user
    * - Input:
    *   Valid recruitmentId, valid user
    * - Expected Output:
    *   - 200 OK, ResponseDto.successDefault with application
    */
-  it('TC-RC-008: Success - Returns application for recruitment and user', async () => {
+  it('TC-RC-016: Success - Returns application for recruitment and user', async () => {
     applicationService.findByRecruitmentAndUser.mockResolvedValue(mockApplication);
     const response = await request(app.getHttpServer())
       .get('/recruitments/1/user-application')
       .set('x-current-user', JSON.stringify(mockUser))
       .expect(200);
-    console.log('[TEST]', 'TC-RC-008: Success - Returns application for recruitment and user');
+    console.log('[TEST]', 'TC-RC-016: Success - Returns application for recruitment and user');
     console.log('Input:', { recruitmentId: 1, user: mockUser });
     console.log('Expected Output:', ResponseDto.successDefault(mockApplication));
     console.log('Actual Output:', response.body);
@@ -589,38 +589,38 @@ describe('RecruitmentController - GET /recruitments/:recruitmentId/user-applicat
   });
 
   /**
-   * TC-RC-009: Not Found - Service throws NotFoundException
+   * TC-RC-017: Not Found - Service throws NotFoundException
    * - Goal: Should propagate NotFoundException from service
    * - Input:
    *   Non-existent recruitmentId, valid user
    * - Expected Output:
    *   - 404 Not Found
    */
-  it('TC-RC-009: Not Found - Service throws NotFoundException', async () => {
+  it('TC-RC-017: Not Found - Service throws NotFoundException', async () => {
     applicationService.findByRecruitmentAndUser.mockRejectedValue(new NotFoundException('Not found'));
     const response = await request(app.getHttpServer())
       .get('/recruitments/999/user-application')
       .set('x-current-user', JSON.stringify(mockUser))
       .expect(404);
-    console.log('[TEST]', 'TC-RC-009: Not Found - Service throws NotFoundException');
+    console.log('[TEST]', 'TC-RC-017: Not Found - Service throws NotFoundException');
     console.log('Input:', { recruitmentId: 999, user: mockUser });
     console.log('Expected Output:', '404 Not Found');
     console.log('Actual Output:', response.body);
   });
 
   /**
-   * TC-RC-010: Unauthorized - No user provided
+   * TC-RC-018: Unauthorized - No user provided
    * - Goal: Should return 401 if user is not provided
    * - Input:
    *   No x-current-user header
    * - Expected Output:
    *   - 401 Unauthorized
    */
-  it('TC-RC-010: Unauthorized - No user provided', async () => {
+  it('TC-RC-018: Unauthorized - No user provided', async () => {
     const response = await request(app.getHttpServer())
       .get('/recruitments/1/user-application')
       .expect(401);
-    console.log('[TEST]', 'TC-RC-010: Unauthorized - No user provided');
+    console.log('[TEST]', 'TC-RC-018: Unauthorized - No user provided');
     console.log('Input:', { recruitmentId: 1, user: null });
     console.log('Expected Output:', '401 Unauthorized');
     console.log('Actual Output:', response.body);
@@ -628,19 +628,19 @@ describe('RecruitmentController - GET /recruitments/:recruitmentId/user-applicat
   });
 
   /**
-   * TC-RC-011: Invalid Input - Non-numeric recruitmentId
+   * TC-RC-019: Invalid Input - Non-numeric recruitmentId
    * - Goal: Should return 400 for non-numeric recruitmentId
    * - Input:
    *   Non-numeric recruitmentId
    * - Expected Output:
    *   - 400 Bad Request
    */
-  it('TC-RC-011: Invalid Input - Non-numeric recruitmentId', async () => {
+  it('TC-RC-019: Invalid Input - Non-numeric recruitmentId', async () => {
     const response = await request(app.getHttpServer())
       .get('/recruitments/not-a-number/user-application')
       .set('x-current-user', JSON.stringify(mockUser))
       .expect(400);
-    console.log('[TEST]', 'TC-RC-011: Invalid Input - Non-numeric recruitmentId');
+    console.log('[TEST]', 'TC-RC-019: Invalid Input - Non-numeric recruitmentId');
     console.log('Input:', { recruitmentId: 'not-a-number', user: mockUser });
     console.log('Expected Output:', '400 Bad Request');
     console.log('Actual Output:', response.body);
