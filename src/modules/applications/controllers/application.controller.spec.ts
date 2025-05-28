@@ -92,6 +92,13 @@ describe('ApplicationController', () => {
   });
 
   describe('POST /applications', () => {
+    /**
+     * Test Case ID: TC-AC-001
+     * Objective: Verify that POST /applications creates an application with valid data
+     * Input: Valid CreateApplicationDto and authenticated user
+     * Expected Output: 201 response with created application
+     * White-Box: Tests the path where all data is valid and application is created
+     */
     it('should create an application (201)', async () => {
       applicationService.createApplication.mockResolvedValue(validApplication);
       const response = await request(app.getHttpServer())
@@ -115,6 +122,13 @@ describe('ApplicationController', () => {
       );
     });
 
+    /**
+     * Test Case ID: TC-AC-002
+     * Objective: Verify that POST /applications returns 400 for invalid payload
+     * Input: Invalid CreateApplicationDto (e.g., empty message)
+     * Expected Output: 400 response
+     * White-Box: Tests the path where validation fails for payload
+     */
     it('should return 400 for invalid payload', async () => {
       const invalidDto = { ...validCreateDto, message: '' };
       await request(app.getHttpServer())
@@ -125,6 +139,13 @@ describe('ApplicationController', () => {
       expect(applicationService.createApplication).not.toHaveBeenCalled();
     });
 
+    /**
+     * Test Case ID: TC-AC-003
+     * Objective: Verify that POST /applications returns 403 if forbidden
+     * Input: Valid CreateApplicationDto and user not allowed to create
+     * Expected Output: 403 response
+     * White-Box: Tests the path where service throws ForbiddenException
+     */
     it('should return 403 if forbidden', async () => {
       applicationService.createApplication.mockRejectedValue(
         new ForbiddenException('Forbidden'),
@@ -137,6 +158,13 @@ describe('ApplicationController', () => {
       expect(applicationService.createApplication).toHaveBeenCalled();
     });
 
+    /**
+     * Test Case ID: TC-AC-004
+     * Objective: Verify that POST /applications returns 400 if bad request
+     * Input: Valid CreateApplicationDto but service throws BadRequestException
+     * Expected Output: 400 response
+     * White-Box: Tests the path where service throws BadRequestException
+     */
     it('should return 400 if bad request', async () => {
       applicationService.createApplication.mockRejectedValue(
         new BadRequestException('Bad request'),
@@ -151,6 +179,13 @@ describe('ApplicationController', () => {
   });
 
   describe('PUT /applications/:applicationId', () => {
+    /**
+     * Test Case ID: TC-AC-005
+     * Objective: Verify that PUT /applications/:applicationId updates an application with valid data
+     * Input: Valid ApplicationDto for update
+     * Expected Output: 200 response with updated application
+     * White-Box: Tests the path where update is successful
+     */
     it('should update an application (200)', async () => {
       applicationService.updateApplication.mockResolvedValue(validApplication);
       const updateDto = { ...validApplication };
@@ -178,6 +213,13 @@ describe('ApplicationController', () => {
       );
     });
 
+    /**
+     * Test Case ID: TC-AC-006
+     * Objective: Verify that PUT /applications/:applicationId returns 404 if not found
+     * Input: Valid ApplicationDto for update, but application does not exist
+     * Expected Output: 404 response
+     * White-Box: Tests the path where service throws NotFoundException
+     */
     it('should return 404 if not found', async () => {
       applicationService.updateApplication.mockRejectedValue(
         new NotFoundException('Not found'),
@@ -190,6 +232,13 @@ describe('ApplicationController', () => {
       expect(applicationService.updateApplication).toHaveBeenCalled();
     });
 
+    /**
+     * Test Case ID: TC-AC-007
+     * Objective: Verify that PUT /applications/:applicationId returns 400 for invalid payload
+     * Input: Invalid ApplicationDto for update (e.g., empty message)
+     * Expected Output: 200 response (no validation on ApplicationDto)
+     * White-Box: Tests the path where update is called with invalid data but no validation
+     */
     it('should return 400 for invalid payload', async () => {
       const invalidDto = { ...validApplication, message: '' };
       await request(app.getHttpServer())

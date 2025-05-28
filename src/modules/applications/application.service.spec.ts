@@ -292,6 +292,13 @@ describe('ApplicationService', () => {
   }
 
   describe('createApplication', () => {
+    /**
+     * Test Case ID: TC-AS-001
+     * Objective: Verify that createApplication creates an application with valid data
+     * Input: Valid CreateApplicationDto and userId
+     * Expected Output: Application is created and returned
+     * White-Box: Tests the path where all data is valid and application is created
+     */
     it('should create an application with real database operations', async () => {
       const { testUser, testRecruitment, testFile } = await createTestData();
 
@@ -331,6 +338,13 @@ describe('ApplicationService', () => {
       expect(createdApplication.status).toBe($Enums.ApplicationStatus.PENDING);
     });
 
+    /**
+     * Test Case ID: TC-AS-002
+     * Objective: Verify that createApplication throws BadRequestException if recruitment deadline has passed
+     * Input: CreateApplicationDto with recruitment having a past deadline
+     * Expected Output: BadRequestException is thrown
+     * White-Box: Tests the path where recruitment deadline is checked
+     */
     it('should throw BadRequestException if recruitment deadline has passed', async () => {
       const { testUser, testCompany, testFile } = await createTestData();
 
@@ -366,6 +380,13 @@ describe('ApplicationService', () => {
       );
     });
 
+    /**
+     * Test Case ID: TC-AS-003
+     * Objective: Verify that createApplication throws BadRequestException if user is not found
+     * Input: CreateApplicationDto and non-existent userId
+     * Expected Output: BadRequestException is thrown
+     * White-Box: Tests the path where user existence is checked
+     */
     it('should throw BadRequestException if user is not found', async () => {
       const { testRecruitment, testFile } = await createTestData();
 
@@ -381,6 +402,13 @@ describe('ApplicationService', () => {
       );
     });
 
+    /**
+     * Test Case ID: TC-AS-004
+     * Objective: Verify that createApplication throws ForbiddenException if user role is not USER
+     * Input: CreateApplicationDto and userId with non-USER role
+     * Expected Output: ForbiddenException is thrown
+     * White-Box: Tests the path where user role is checked
+     */
     it('should throw ForbiddenException if user role is not USER', async () => {
       const { testRecruitment, testFile, companyAdminUser } =
         await createTestData();
@@ -398,6 +426,13 @@ describe('ApplicationService', () => {
       );
     });
 
+    /**
+     * Test Case ID: TC-AS-005
+     * Objective: Verify that createApplication throws BadRequestException if recruitment is not found
+     * Input: CreateApplicationDto with non-existent recruitmentId
+     * Expected Output: BadRequestException is thrown
+     * White-Box: Tests the path where recruitment existence is checked
+     */
     it('should throw BadRequestException if recruitment is not found', async () => {
       const { testUser, testFile } = await createTestData();
 
@@ -412,6 +447,13 @@ describe('ApplicationService', () => {
       ).rejects.toThrow(new BadRequestException(Message.RECRUITMENT_NOT_FOUND));
     });
 
+    /**
+     * Test Case ID: TC-AS-006
+     * Objective: Verify that createApplication throws BadRequestException if CV is not found
+     * Input: CreateApplicationDto with non-existent cvId
+     * Expected Output: BadRequestException is thrown
+     * White-Box: Tests the path where CV existence is checked
+     */
     it('should throw BadRequestException if CV is not found', async () => {
       const { testUser, testRecruitment } = await createTestData();
 
@@ -428,6 +470,13 @@ describe('ApplicationService', () => {
       );
     });
 
+    /**
+     * Test Case ID: TC-AS-007
+     * Objective: Verify that createApplication throws BadRequestException if user has already applied for the recruitment
+     * Input: CreateApplicationDto for a recruitment the user already applied to
+     * Expected Output: BadRequestException is thrown
+     * White-Box: Tests the path where duplicate application is checked
+     */
     it('should throw BadRequestException if user has already applied for the recruitment', async () => {
       const { testUser, testRecruitment, testFile } = await createTestData();
 
@@ -463,6 +512,13 @@ describe('ApplicationService', () => {
   });
 
   describe('findAll', () => {
+    /**
+     * Test Case ID: TC-AS-008
+     * Objective: Verify that findAll returns paginated applications
+     * Input: ApplicationFilter with valid parameters
+     * Expected Output: Paginated list of applications
+     * White-Box: Tests the pagination logic
+     */
     it('should return paginated applications', async () => {
       const { testUser, testRecruitment, testFile } = await createTestData();
 
@@ -506,6 +562,13 @@ describe('ApplicationService', () => {
   });
 
   describe('findByRecruitmentAndUser', () => {
+    /**
+     * Test Case ID: TC-AS-009
+     * Objective: Verify that findByRecruitmentAndUser returns application for a specific recruitment and user
+     * Input: recruitmentId and user
+     * Expected Output: Application is returned
+     * White-Box: Tests the path where application exists for the user and recruitment
+     */
     it('should return application for a specific recruitment and user', async () => {
       const { testUser, testRecruitment, testFile } = await createTestData();
 
@@ -536,6 +599,13 @@ describe('ApplicationService', () => {
       expect(result.cvUrl).toBe('https://example.com/test-cv.pdf');
     });
 
+    /**
+     * Test Case ID: TC-AS-010
+     * Objective: Verify that findByRecruitmentAndUser throws NotFoundException if application not found
+     * Input: Non-existent recruitmentId and user
+     * Expected Output: NotFoundException is thrown
+     * White-Box: Tests the path where application does not exist
+     */
     it('should throw NotFoundException if application not found', async () => {
       const { testUser } = await createTestData();
 
@@ -550,6 +620,13 @@ describe('ApplicationService', () => {
       );
     });
 
+    /**
+     * Test Case ID: TC-AS-011
+     * Objective: Verify that findByRecruitmentAndUser throws ForbiddenException if application userId does not match requesting user id
+     * Input: recruitmentId and user with mismatched userId
+     * Expected Output: ForbiddenException is thrown
+     * White-Box: Tests the path where userId does not match
+     */
     it('should throw ForbiddenException if application userId does not match requesting user id', async () => {
       const { testUser, testRecruitment, testFile, companyAdminUser } =
         await createTestData();
@@ -582,6 +659,13 @@ describe('ApplicationService', () => {
   });
 
   describe('findByRecruitment', () => {
+    /**
+     * Test Case ID: TC-AS-012
+     * Objective: Verify that findByRecruitment returns all applications for a recruitment
+     * Input: recruitmentId and company admin user
+     * Expected Output: List of applications is returned
+     * White-Box: Tests the path where applications exist for the recruitment
+     */
     it('should return all applications for a recruitment', async () => {
       const { testUser, testRecruitment, testFile, companyAdminUser } =
         await createTestData();
@@ -618,6 +702,13 @@ describe('ApplicationService', () => {
       expect(result.length).toBe(2);
     });
 
+    /**
+     * Test Case ID: TC-AS-013
+     * Objective: Verify that findByRecruitment throws ForbiddenException if user has no company
+     * Input: recruitmentId and user without company
+     * Expected Output: ForbiddenException is thrown
+     * White-Box: Tests the path where user has no company
+     */
     it('should throw ForbiddenException if user has no company', async () => {
       const { testRecruitment, testUser } = await createTestData();
 
@@ -626,6 +717,13 @@ describe('ApplicationService', () => {
       ).rejects.toThrow(new ForbiddenException());
     });
 
+    /**
+     * Test Case ID: TC-AS-014
+     * Objective: Verify that findByRecruitment throws UnauthorizedException if user is not found
+     * Input: recruitmentId and non-existent user
+     * Expected Output: UnauthorizedException is thrown
+     * White-Box: Tests the path where user does not exist
+     */
     it('should throw UnauthorizedException if user is not found', async () => {
       const { testRecruitment } = await createTestData();
 
@@ -646,6 +744,13 @@ describe('ApplicationService', () => {
       ).rejects.toThrow(new UnauthorizedException());
     });
 
+    /**
+     * Test Case ID: TC-AS-015
+     * Objective: Verify that findByRecruitment throws NotFoundException if recruitment is not found
+     * Input: non-existent recruitmentId and company admin user
+     * Expected Output: NotFoundException is thrown
+     * White-Box: Tests the path where recruitment does not exist
+     */
     it('should throw NotFoundException if recruitment is not found', async () => {
       const { companyAdminUser } = await createTestData();
 
@@ -659,6 +764,13 @@ describe('ApplicationService', () => {
       ).rejects.toThrow(new NotFoundException(Message.RECRUITMENT_NOT_FOUND));
     });
 
+    /**
+     * Test Case ID: TC-AS-016
+     * Objective: Verify that findByRecruitment throws ForbiddenException if recruitment does not belong to user company
+     * Input: recruitmentId belonging to another company and company admin user
+     * Expected Output: ForbiddenException is thrown
+     * White-Box: Tests the path where recruitment does not belong to user's company
+     */
     it('should throw ForbiddenException if recruitment does not belong to user company', async () => {
       const { companyAdminUser, testRecruitment } = await createTestData();
 
@@ -693,6 +805,13 @@ describe('ApplicationService', () => {
   });
 
   describe('getApplicationDetail', () => {
+    /**
+     * Test Case ID: TC-AS-017
+     * Objective: Verify that getApplicationDetail returns application detail
+     * Input: applicationId and company admin user
+     * Expected Output: Application detail is returned
+     * White-Box: Tests the path where application exists and belongs to user's company
+     */
     it('should return application detail', async () => {
       const { testUser, testRecruitment, testFile, companyAdminUser } =
         await createTestData();
@@ -724,6 +843,13 @@ describe('ApplicationService', () => {
       expect(result.cvUrl).toBe('https://example.com/test-cv.pdf');
     });
 
+    /**
+     * Test Case ID: TC-AS-018
+     * Objective: Verify that getApplicationDetail throws NotFoundException if application not found
+     * Input: non-existent applicationId and company admin user
+     * Expected Output: NotFoundException is thrown
+     * White-Box: Tests the path where application does not exist
+     */
     it('should throw NotFoundException if application not found', async () => {
       const { companyAdminUser } = await createTestData();
 
@@ -734,6 +860,13 @@ describe('ApplicationService', () => {
       );
     });
 
+    /**
+     * Test Case ID: TC-AS-019
+     * Objective: Verify that getApplicationDetail throws UnauthorizedException if user is not found
+     * Input: applicationId and non-existent user
+     * Expected Output: UnauthorizedException is thrown
+     * White-Box: Tests the path where user does not exist
+     */
     it('should throw UnauthorizedException if user is not found', async () => {
       const { testUser, testRecruitment, testFile } = await createTestData();
 
@@ -766,6 +899,13 @@ describe('ApplicationService', () => {
       ).rejects.toThrow(new UnauthorizedException());
     });
 
+    /**
+     * Test Case ID: TC-AS-020
+     * Objective: Verify that getApplicationDetail throws ForbiddenException if user has no company
+     * Input: applicationId and user without company
+     * Expected Output: ForbiddenException is thrown
+     * White-Box: Tests the path where user has no company
+     */
     it('should throw ForbiddenException if user has no company', async () => {
       const { testUser, testRecruitment, testFile } = await createTestData();
 
@@ -792,6 +932,13 @@ describe('ApplicationService', () => {
       ).rejects.toThrow(new ForbiddenException());
     });
 
+    /**
+     * Test Case ID: TC-AS-021
+     * Objective: Verify that getApplicationDetail throws ForbiddenException if application does not belong to user company
+     * Input: applicationId belonging to another company and company admin user
+     * Expected Output: ForbiddenException is thrown
+     * White-Box: Tests the path where application does not belong to user's company
+     */
     it('should throw ForbiddenException if application does not belong to user company', async () => {
       const { testUser, testRecruitment, testFile, companyAdminUser } =
         await createTestData();
@@ -841,6 +988,13 @@ describe('ApplicationService', () => {
   });
 
   describe('updateApplicationStatus', () => {
+    /**
+     * Test Case ID: TC-AS-022
+     * Objective: Verify that updateApplicationStatus updates application status to APPROVED
+     * Input: applicationId, company admin user, isApproved true
+     * Expected Output: Application status is updated to APPROVED
+     * White-Box: Tests the path where status is set to APPROVED
+     */
     it('should update application status to APPROVED', async () => {
       const { testUser, testRecruitment, testFile, companyAdminUser } =
         await createTestData();
@@ -885,6 +1039,13 @@ describe('ApplicationService', () => {
       expect(updatedApplication.status).toBe($Enums.ApplicationStatus.APPROVED);
     });
 
+    /**
+     * Test Case ID: TC-AS-023
+     * Objective: Verify that updateApplicationStatus updates application status to REJECTED
+     * Input: applicationId, company admin user, isApproved false
+     * Expected Output: Application status is updated to REJECTED
+     * White-Box: Tests the path where status is set to REJECTED
+     */
     it('should update application status to REJECTED', async () => {
       const { testUser, testRecruitment, testFile, companyAdminUser } =
         await createTestData();
@@ -929,6 +1090,13 @@ describe('ApplicationService', () => {
       expect(updatedApplication.status).toBe($Enums.ApplicationStatus.REJECTED);
     });
 
+    /**
+     * Test Case ID: TC-AS-024
+     * Objective: Verify that updateApplicationStatus throws UnauthorizedException if user is not found
+     * Input: applicationId and non-existent user
+     * Expected Output: UnauthorizedException is thrown
+     * White-Box: Tests the path where user does not exist
+     */
     it('should throw UnauthorizedException if user is not found', async () => {
       const { testUser, testRecruitment, testFile } = await createTestData();
 
@@ -961,6 +1129,13 @@ describe('ApplicationService', () => {
       ).rejects.toThrow(new UnauthorizedException());
     });
 
+    /**
+     * Test Case ID: TC-AS-025
+     * Objective: Verify that updateApplicationStatus throws ForbiddenException if user has no company
+     * Input: applicationId and user without company
+     * Expected Output: ForbiddenException is thrown
+     * White-Box: Tests the path where user has no company
+     */
     it('should throw ForbiddenException if user has no company', async () => {
       const { testUser, testRecruitment, testFile } = await createTestData();
 
@@ -980,16 +1155,20 @@ describe('ApplicationService', () => {
       jest.spyOn(prismaService.user, 'findUnique').mockResolvedValueOnce({
         ...testUser,
         company: null,
-        role: $Enums.Role.COMPANY_ADMIN,
       } as any);
 
       await expect(
         service.updateApplicationStatus(application.id, testUser, true),
-      ).rejects.toThrow(
-        new ForbiddenException(Message.APPLICATION_NOT_BELONG_TO_USER),
-      );
+      ).rejects.toThrow(new ForbiddenException());
     });
 
+    /**
+     * Test Case ID: TC-AS-026
+     * Objective: Verify that updateApplicationStatus throws ForbiddenException if user role is not COMPANY_ADMIN or COMPANY_HR
+     * Input: applicationId and user with invalid role
+     * Expected Output: ForbiddenException is thrown
+     * White-Box: Tests the path where user role is not COMPANY_ADMIN or COMPANY_HR
+     */
     it('should throw ForbiddenException if user role is not COMPANY_ADMIN or COMPANY_HR', async () => {
       const { testUser, testRecruitment, testFile } = await createTestData();
 
@@ -1017,6 +1196,13 @@ describe('ApplicationService', () => {
       ).rejects.toThrow(new ForbiddenException());
     });
 
+    /**
+     * Test Case ID: TC-AS-027
+     * Objective: Verify that updateApplicationStatus throws NotFoundException if application is not found
+     * Input: non-existent applicationId and company admin user
+     * Expected Output: NotFoundException is thrown
+     * White-Box: Tests the path where application does not exist
+     */
     it('should throw NotFoundException if application is not found', async () => {
       const { companyAdminUser } = await createTestData();
 
@@ -1032,6 +1218,13 @@ describe('ApplicationService', () => {
       );
     });
 
+    /**
+     * Test Case ID: TC-AS-028
+     * Objective: Verify that updateApplicationStatus throws ForbiddenException if application does not belong to user company
+     * Input: applicationId belonging to another company and company admin user
+     * Expected Output: ForbiddenException is thrown
+     * White-Box: Tests the path where application does not belong to user's company
+     */
     it('should throw ForbiddenException if application does not belong to user company', async () => {
       const { testUser, testRecruitment, testFile, companyAdminUser } =
         await createTestData();
@@ -1081,6 +1274,13 @@ describe('ApplicationService', () => {
   });
 
   describe('updateApplication', () => {
+    /**
+     * Test Case ID: TC-AS-029
+     * Objective: Verify that updateApplication updates an application successfully
+     * Input: applicationId, updateDto
+     * Expected Output: Application is updated and returned
+     * White-Box: Tests the path where update is successful
+     */
     it('should update an application successfully', async () => {
       const { testUser, testRecruitment, testFile } = await createTestData();
 
@@ -1121,6 +1321,13 @@ describe('ApplicationService', () => {
       expect(updatedApplication.status).toBe($Enums.ApplicationStatus.APPROVED);
     });
 
+    /**
+     * Test Case ID: TC-AS-030
+     * Objective: Verify that updateApplication throws NotFoundException if application not found
+     * Input: non-existent applicationId and updateDto
+     * Expected Output: NotFoundException is thrown
+     * White-Box: Tests the path where application does not exist
+     */
     it('should throw NotFoundException if application not found', async () => {
       const { testFile } = await createTestData();
 

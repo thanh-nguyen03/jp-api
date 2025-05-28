@@ -78,6 +78,13 @@ describe('ManageApplicationController', () => {
   });
 
   describe('GET /admin/applications/:applicationId', () => {
+    /**
+     * Test Case ID: TC-MAC-001
+     * Objective: Verify that GET /admin/applications/:applicationId returns application detail with valid data
+     * Input: applicationId and authenticated admin user
+     * Expected Output: 200 response with application detail
+     * White-Box: Tests the path where application exists and user is authorized
+     */
     it('should return application detail (200)', async () => {
       applicationService.getApplicationDetail.mockResolvedValue(
         validApplication,
@@ -105,6 +112,13 @@ describe('ManageApplicationController', () => {
       );
     });
 
+    /**
+     * Test Case ID: TC-MAC-002
+     * Objective: Verify that GET /admin/applications/:applicationId returns 404 if not found
+     * Input: non-existent applicationId and authenticated admin user
+     * Expected Output: 404 response
+     * White-Box: Tests the path where application does not exist
+     */
     it('should return 404 if not found', async () => {
       applicationService.getApplicationDetail.mockRejectedValue(
         new NotFoundException('Not found'),
@@ -116,6 +130,13 @@ describe('ManageApplicationController', () => {
       expect(applicationService.getApplicationDetail).toHaveBeenCalled();
     });
 
+    /**
+     * Test Case ID: TC-MAC-003
+     * Objective: Verify that GET /admin/applications/:applicationId returns 403 if forbidden
+     * Input: applicationId and authenticated admin user without permission
+     * Expected Output: 403 response
+     * White-Box: Tests the path where user is forbidden
+     */
     it('should return 403 if forbidden', async () => {
       applicationService.getApplicationDetail.mockRejectedValue(
         new ForbiddenException('Forbidden'),
@@ -127,6 +148,13 @@ describe('ManageApplicationController', () => {
       expect(applicationService.getApplicationDetail).toHaveBeenCalled();
     });
 
+    /**
+     * Test Case ID: TC-MAC-004
+     * Objective: Verify that GET /admin/applications/:applicationId returns 401 if unauthorized
+     * Input: applicationId and unauthorized user
+     * Expected Output: 401 response
+     * White-Box: Tests the path where user is unauthorized
+     */
     it('should return 401 if unauthorized', async () => {
       applicationService.getApplicationDetail.mockRejectedValue(
         new UnauthorizedException('Unauthorized'),
@@ -140,6 +168,13 @@ describe('ManageApplicationController', () => {
   });
 
   describe('PUT /admin/applications/:applicationId/status', () => {
+    /**
+     * Test Case ID: TC-MAC-005
+     * Objective: Verify that PUT /admin/applications/:applicationId/status updates application status with valid data
+     * Input: applicationId, authenticated admin user, valid isApproved
+     * Expected Output: 200 response with updated application
+     * White-Box: Tests the path where status update is successful
+     */
     it('should update application status (200)', async () => {
       applicationService.updateApplicationStatus.mockResolvedValue(
         validApplication,
@@ -169,6 +204,13 @@ describe('ManageApplicationController', () => {
       );
     });
 
+    /**
+     * Test Case ID: TC-MAC-006
+     * Objective: Verify that PUT /admin/applications/:applicationId/status returns 400 for invalid isApproved
+     * Input: applicationId, authenticated admin user, invalid isApproved
+     * Expected Output: 400 response
+     * White-Box: Tests the path where validation fails for isApproved
+     */
     it('should return 400 for invalid isApproved', async () => {
       await request(app.getHttpServer())
         .put('/admin/applications/1/status')
@@ -178,6 +220,13 @@ describe('ManageApplicationController', () => {
       expect(applicationService.updateApplicationStatus).not.toHaveBeenCalled();
     });
 
+    /**
+     * Test Case ID: TC-MAC-007
+     * Objective: Verify that PUT /admin/applications/:applicationId/status returns 404 if not found
+     * Input: non-existent applicationId, authenticated admin user, valid isApproved
+     * Expected Output: 404 response
+     * White-Box: Tests the path where application does not exist
+     */
     it('should return 404 if not found', async () => {
       applicationService.updateApplicationStatus.mockRejectedValue(
         new NotFoundException('Not found'),
@@ -190,6 +239,13 @@ describe('ManageApplicationController', () => {
       expect(applicationService.updateApplicationStatus).toHaveBeenCalled();
     });
 
+    /**
+     * Test Case ID: TC-MAC-008
+     * Objective: Verify that PUT /admin/applications/:applicationId/status returns 403 if forbidden
+     * Input: applicationId, authenticated admin user without permission, valid isApproved
+     * Expected Output: 403 response
+     * White-Box: Tests the path where user is forbidden
+     */
     it('should return 403 if forbidden', async () => {
       applicationService.updateApplicationStatus.mockRejectedValue(
         new ForbiddenException('Forbidden'),
@@ -202,6 +258,13 @@ describe('ManageApplicationController', () => {
       expect(applicationService.updateApplicationStatus).toHaveBeenCalled();
     });
 
+    /**
+     * Test Case ID: TC-MAC-009
+     * Objective: Verify that PUT /admin/applications/:applicationId/status returns 401 if unauthorized
+     * Input: applicationId, unauthorized user, valid isApproved
+     * Expected Output: 401 response
+     * White-Box: Tests the path where user is unauthorized
+     */
     it('should return 401 if unauthorized', async () => {
       applicationService.updateApplicationStatus.mockRejectedValue(
         new UnauthorizedException('Unauthorized'),
